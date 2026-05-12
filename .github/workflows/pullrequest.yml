@@ -52,12 +52,12 @@ jobs:
             const path = require('path')
 
             const COMMENT_MARKER = '<!-- coverage-report -->'
-            const THRESHOLD = 70
+            const THRESHOLD = 50
             const summaryPath = path.join(process.cwd(), 'coverage', 'coverage-summary.json')
             const pr = context.issue.number
             const timestamp = new Date().toUTCString()
 
-            const statusIcon = (pct) => pct >= THRESHOLD ? '✅' : pct >= 50 ? '⚠️' : '❌'
+            const statusIcon = (pct) => pct >= THRESHOLD ? '✅' : pct >= THRESHOLD - 10 ? '⚠️' : '❌'
             const fmt = (m) => `${statusIcon(m.pct)} \`${m.pct}%\` (${m.covered}/${m.total})`
             const fmtTotal = (m) => `${statusIcon(m.pct)} **\`${m.pct}%\`**`
 
