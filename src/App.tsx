@@ -57,7 +57,7 @@ export function App() {
 				</div>
 			</header>
 
-			<main className="mx-auto max-w-5xl px-4 py-6">
+			<main className="mx-auto max-w-full px-4 py-6">
 				<div className="mb-6 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
 					<Stepper
 						activeStep={activeStep}

@@ -1,4 +1,4 @@
-import { Download, Page, Printer } from 'iconoir-react'
+import { Download, Printer } from 'iconoir-react'
 import { useMemo, useRef, useState } from 'react'
 
 import { useAppStore } from '@/store/useAppStore'
@@ -10,7 +10,6 @@ import {
 	Button,
 	Card,
 	CardContent,
-	CardFooter,
 	CardHeader,
 	CardTitle,
 	Modal,
@@ -190,16 +189,23 @@ export function RisultatiStep() {
 							<Button
 								variant="secondary"
 								size="sm"
+								onClick={() => setActiveStep('consumi')}
+							>
+								← Consumi
+							</Button>
+							<Button
+								variant="secondary"
+								size="sm"
 								onClick={handlePreviewPDF}
 								disabled={loadingPdf}
 							>
 								<Printer className="h-3.5 w-3.5" />
 								{loadingPdf ? 'Caricamento...' : 'Anteprima PDF'}
 							</Button>
-							<Button variant="secondary" size="sm" onClick={handleDownloadPDF}>
+							{/* <Button variant="secondary" size="sm" onClick={handleDownloadPDF}>
 								<Page className="h-3.5 w-3.5" />
 								PDF
-							</Button>
+							</Button> */}
 							<Button variant="secondary" size="sm" onClick={handleDownloadCSV}>
 								<Download className="h-3.5 w-3.5" />
 								CSV
@@ -211,7 +217,7 @@ export function RisultatiStep() {
 				</CardHeader>
 				<CardContent className="p-0">
 					<div ref={tableRef} className="overflow-x-auto bg-white p-4">
-						<div className="flex">
+						<div className="mb-8 flex justify-between border-slate-200 border-b pb-3">
 							<div className="mb-4 flex flex-col gap-4">
 								<h2 className="font-black text-2xl text-slate-900 uppercase tracking-tighter">
 									Ripartizione Consumo Acqua
@@ -224,52 +230,6 @@ export function RisultatiStep() {
 										{bolletta.viaCondominio}
 									</p>
 								)}
-								<div className="flex min-w-50 flex-col gap-1 text-right">
-									<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
-										<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-											Bolletta N°
-										</span>
-										<span className="font-bold font-mono text-slate-900 text-xs">
-											{bolletta.numeroBolletta || '—'}
-										</span>
-									</div>
-									<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
-										<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-											Data Documento
-										</span>
-										<span className="font-bold text-slate-900 text-xs">
-											{bolletta.dataDocumento
-												? new Date(bolletta.dataDocumento).toLocaleDateString(
-														'it-IT',
-													)
-												: '—'}
-										</span>
-									</div>
-									<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
-										<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-											Periodo
-										</span>
-										<span className="font-bold text-slate-900 text-xs">
-											{new Date(bolletta.dataInizio).toLocaleDateString(
-												'it-IT',
-											)}{' '}
-											—{' '}
-											{new Date(bolletta.dataFine).toLocaleDateString('it-IT')}
-										</span>
-									</div>
-									<div className="flex justify-between gap-4 py-0.5">
-										<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-											Scadenza
-										</span>
-										<span className="font-black text-red-600 text-sm">
-											{bolletta.dataScadenza
-												? new Date(bolletta.dataScadenza).toLocaleDateString(
-														'it-IT',
-													)
-												: '—'}
-										</span>
-									</div>
-								</div>
 
 								{bolletta.dataProssimaLettura && (
 									<p className="font-medium text-[10px] text-slate-500 uppercase tracking-wide">
@@ -280,9 +240,52 @@ export function RisultatiStep() {
 									</p>
 								)}
 							</div>
+							<div className="flex min-w-50 flex-col gap-1 text-right">
+								<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
+									<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+										Bolletta N°
+									</span>
+									<span className="font-bold font-mono text-slate-900 text-xs">
+										{bolletta.numeroBolletta || '—'}
+									</span>
+								</div>
+								<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
+									<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+										Data Documento
+									</span>
+									<span className="font-bold text-slate-900 text-xs">
+										{bolletta.dataDocumento
+											? new Date(bolletta.dataDocumento).toLocaleDateString(
+													'it-IT',
+												)
+											: '—'}
+									</span>
+								</div>
+								<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
+									<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+										Periodo
+									</span>
+									<span className="font-bold text-slate-900 text-xs">
+										{new Date(bolletta.dataInizio).toLocaleDateString('it-IT')}{' '}
+										— {new Date(bolletta.dataFine).toLocaleDateString('it-IT')}
+									</span>
+								</div>
+								<div className="flex justify-between gap-4 py-0.5">
+									<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+										Scadenza
+									</span>
+									<span className="font-black text-red-600 text-sm">
+										{bolletta.dataScadenza
+											? new Date(bolletta.dataScadenza).toLocaleDateString(
+													'it-IT',
+												)
+											: '—'}
+									</span>
+								</div>
+							</div>
 						</div>
 						<table
-							className="w-full border-collapse text-xs"
+							className="mb-8 w-full border-collapse text-xs"
 							style={{ minWidth: '1100px' }}
 						>
 							<thead>
@@ -346,7 +349,7 @@ export function RisultatiStep() {
 							</tfoot>
 						</table>
 
-						<div className="mt-4 grid grid-cols-1 gap-3 text-slate-600 text-xs sm:grid-cols-2">
+						<div className="mt-4 grid grid-cols-1 gap-3 border-slate-200 border-t pt-8 text-slate-600 text-xs sm:grid-cols-2">
 							<div className="space-y-1">
 								<p>
 									<strong>Consumo dichiarato in bolletta:</strong>{' '}
@@ -387,11 +390,6 @@ export function RisultatiStep() {
 						</div>
 					</div>
 				</CardContent>
-				<CardFooter>
-					<Button variant="secondary" onClick={() => setActiveStep('consumi')}>
-						← Consumi
-					</Button>
-				</CardFooter>
 			</Card>
 
 			<Modal

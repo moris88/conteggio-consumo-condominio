@@ -46,7 +46,13 @@ export function Alert({
 }: AlertProps) {
 	const { icon: Icon, classes } = config[variant]
 	return (
-		<div className={cn('flex items-center gap-3 rounded-lg border p-4', classes, className)}>
+		<div
+			className={cn(
+				'flex items-center gap-3 rounded-lg border p-4',
+				classes,
+				className,
+			)}
+		>
 			<Icon className="mt-0.5 h-5 w-5 shrink-0" />
 			<div className="flex-1 text-sm">
 				{title && <p className="mb-1 font-semibold">{title}</p>}
