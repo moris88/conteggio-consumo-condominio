@@ -54,7 +54,7 @@ describe('RisultatiStep', () => {
 		expect(screen.getAllByText(/10/).length).toBeGreaterThan(0) // Consumo reale
 
 		// Verifica pulsanti export
-		expect(screen.getByText('PDF')).toBeDefined()
+		expect(screen.getByText('← Consumi')).toBeDefined()
 		expect(screen.getByText('CSV')).toBeDefined()
 		expect(screen.getByText('Anteprima PDF')).toBeDefined()
 	})
