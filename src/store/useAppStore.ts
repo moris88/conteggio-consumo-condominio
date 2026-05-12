@@ -40,6 +40,7 @@ export const BOLLETTA_DEFAULT: BollettaAcqua = {
 interface AppStore {
 	condomini: Condomino[]
 	bolletta: BollettaAcqua
+	type: 'acqua' | 'luce'
 	activeStep: AppStep
 	addCondomino: (
 		data: Omit<Condomino, 'id' | 'letturaAttuale' | 'letturaPrecedente'>,
@@ -48,6 +49,7 @@ interface AppStore {
 	deleteCondomino: (id: string) => void
 	setCondomini: (condomini: Condomino[]) => void
 	setBolletta: (bolletta: BollettaAcqua) => void
+	setType: (type: 'acqua' | 'luce') => void
 	setActiveStep: (step: AppStep) => void
 	reset: () => void
 }
@@ -57,6 +59,7 @@ export const useAppStore = create<AppStore>()(
 		(set) => ({
 			condomini: [],
 			bolletta: BOLLETTA_DEFAULT,
+			type: 'acqua',
 			activeStep: 'condomini',
 
 			addCondomino: (data) =>
@@ -89,6 +92,8 @@ export const useAppStore = create<AppStore>()(
 			setBolletta: (bolletta) => set({ bolletta }),
 
 			setActiveStep: (activeStep) => set({ activeStep }),
+
+			setType: (type) => set({ type }),
 
 			reset: () =>
 				set({

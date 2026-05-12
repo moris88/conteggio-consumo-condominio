@@ -12,8 +12,15 @@ import { getConsumoReale } from '@/utils/calcoli'
 import { Tooltip } from './components'
 
 export function App() {
-	const { activeStep, setActiveStep, condomini, bolletta, reset } =
-		useAppStore()
+	const {
+		activeStep,
+		setActiveStep,
+		condomini,
+		bolletta,
+		reset,
+		setType,
+		type,
+	} = useAppStore()
 
 	const completedSteps = useMemo<AppStep[]>(() => {
 		const steps: AppStep[] = []
@@ -26,13 +33,18 @@ export function App() {
 		return steps
 	}, [condomini, bolletta])
 
+	const tabs = [
+		{ id: 'acqua', label: 'Bolletta Acqua' },
+		{ id: 'luce', label: 'Bolletta Luce' },
+	]
+
 	return (
 		<div className="min-h-screen bg-slate-50">
 			<header className="border-slate-200 border-b bg-white shadow-sm">
 				<div className="mx-auto flex items-center justify-between px-4 py-4">
 					<div>
 						<h1 className="font-bold text-lg text-slate-900 leading-tight">
-							Gestione Consumo Acqua
+							Gestione Consumo Condominio
 						</h1>
 						<p className="text-slate-500 text-xs">
 							Ripartizione spese condominiali
@@ -61,18 +73,44 @@ export function App() {
 			</header>
 
 			<main className="mx-auto max-w-full px-4 py-6">
-				<div className="mb-6 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
-					<Stepper
-						activeStep={activeStep}
-						completedSteps={completedSteps}
-						onStepChange={setActiveStep}
-					/>
-				</div>
+				{tabs.map((t) => (
+					<button
+						key={t.id}
+						type="button"
+						onClick={() => setType(t.id as 'acqua' | 'luce')}
+						className={`mr-2 mb-4 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+							type === t.id
+								? 'bg-blue-600 text-white'
+								: 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+						}`}
+					>
+						{t.label}
+					</button>
+				))}
+				{type === 'luce' && (
+					<div>
+						<p className="text-slate-500">
+							La funzionalità per la gestione della bolletta luce è in sviluppo.
+							Resta sintonizzato!
+						</p>
+					</div>
+				)}
+				{type === 'acqua' && (
+					<>
+						<div className="mb-6 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+							<Stepper
+								activeStep={activeStep}
+								completedSteps={completedSteps}
+								onStepChange={setActiveStep}
+							/>
+						</div>
 
-				{activeStep === 'condomini' && <CondominiStep />}
-				{activeStep === 'bolletta' && <BollettaStep />}
-				{activeStep === 'consumi' && <ConsumiStep />}
-				{activeStep === 'risultati' && <RisultatiStep />}
+						{activeStep === 'condomini' && <CondominiStep />}
+						{activeStep === 'bolletta' && <BollettaStep />}
+						{activeStep === 'consumi' && <ConsumiStep />}
+						{activeStep === 'risultati' && <RisultatiStep />}
+					</>
+				)}
 			</main>
 		</div>
 	)
