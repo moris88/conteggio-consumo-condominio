@@ -41,7 +41,7 @@ jobs:
       - name: Get changed TypeScript files
         id: changed
         run: |
-          files=$(git diff --name-only "${{ steps.base.outputs.base }}" HEAD \
+          files=$(git diff --name-only --diff-filter=d "${{ steps.base.outputs.base }}" HEAD \
             | grep -E '\.(ts|tsx)$' \
             | grep -v 'node_modules' \
             || true)
