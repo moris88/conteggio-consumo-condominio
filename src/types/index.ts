@@ -20,33 +20,33 @@ export interface Condomino {
 }
 
 export interface BollettaAcqua {
-  dataInizio: string;
-  dataFine: string;
-  dataScadenza: string;
-  numeroBolletta: string;
-  viaCondominio: string;
-  dataDocumento: string;
-  dataProssimaLettura: string;
-  sogliaDiscrepanza: number;
-  consumoTotale: number;
-  quotaFissa: number;
-  tariffaAgevolata: number;
-  eccedenzaBase: number;
-  eccedenzaFascia1: number;
-  eccedenzaFascia2: number;
-  eccedenzaFascia3: number;
-  tariffaAgevolataMin: number;
-  eccedenzaBaseMin: number;
-  eccedenzaFascia1Min: number;
-  eccedenzaFascia2Min: number;
-  eccedenzaFascia3Min: number;
-  quotaFogna: number;
-  quotaDepurazione: number;
-  quotaPerequazione: number;
-  iva: number;
-  rettificaAcconti: number;
-  spesePostali: number;
-  speseGestione: number;
+	dataInizio: string
+	dataFine: string
+	dataScadenza: string
+	numeroBolletta: string
+	viaCondominio: string
+	dataDocumento: string
+	dataProssimaLettura: string
+	sogliaDiscrepanza: number
+	consumoTotale: number
+	quotaFissa: number
+	tariffaAgevolata: number
+	eccedenzaBase: number
+	eccedenzaFascia1: number
+	eccedenzaFascia2: number
+	eccedenzaFascia3: number
+	tariffaAgevolataMin: number
+	eccedenzaBaseMin: number
+	eccedenzaFascia1Min: number
+	eccedenzaFascia2Min: number
+	eccedenzaFascia3Min: number
+	quotaFogna: number
+	quotaDepurazione: number
+	quotaPerequazione: number
+	iva: number
+	rettificaAcconti: number
+	spesePostali: number
+	speseGestione: number
 }
 
 export interface RigaRisultato {
