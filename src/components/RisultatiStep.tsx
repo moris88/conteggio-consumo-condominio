@@ -211,9 +211,7 @@ export function RisultatiStep() {
 				</CardHeader>
 				<CardContent className="p-0">
 					<div ref={tableRef} className="overflow-x-auto bg-white p-4">
-						<div
-							className="flex"
-						>
+						<div className="flex">
 							<div className="mb-4 flex flex-col gap-4">
 								<h2 className="font-black text-2xl text-slate-900 uppercase tracking-tighter">
 									Ripartizione Consumo Acqua
@@ -242,8 +240,8 @@ export function RisultatiStep() {
 										<span className="font-bold text-slate-900 text-xs">
 											{bolletta.dataDocumento
 												? new Date(bolletta.dataDocumento).toLocaleDateString(
-													'it-IT',
-												)
+														'it-IT',
+													)
 												: '—'}
 										</span>
 									</div>
@@ -252,8 +250,11 @@ export function RisultatiStep() {
 											Periodo
 										</span>
 										<span className="font-bold text-slate-900 text-xs">
-											{new Date(bolletta.dataInizio).toLocaleDateString('it-IT')}{' '}
-											— {new Date(bolletta.dataFine).toLocaleDateString('it-IT')}
+											{new Date(bolletta.dataInizio).toLocaleDateString(
+												'it-IT',
+											)}{' '}
+											—{' '}
+											{new Date(bolletta.dataFine).toLocaleDateString('it-IT')}
 										</span>
 									</div>
 									<div className="flex justify-between gap-4 py-0.5">
@@ -263,8 +264,8 @@ export function RisultatiStep() {
 										<span className="font-black text-red-600 text-sm">
 											{bolletta.dataScadenza
 												? new Date(bolletta.dataScadenza).toLocaleDateString(
-													'it-IT',
-												)
+														'it-IT',
+													)
 												: '—'}
 										</span>
 									</div>

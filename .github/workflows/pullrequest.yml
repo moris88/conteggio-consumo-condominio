@@ -36,6 +36,9 @@ jobs:
       - name: 'TypeScript type check'
         run: pnpm tsc --noEmit
 
+      - name: 'Build test'
+        run: pnpm build
+
       # - name: 'Test con coverage'
       #   run: pnpm test:coverage
 
@@ -121,6 +124,3 @@ jobs:
       #   with:
       #     name: coverage-report
       #     path: coverage/
-
-      - name: 'Build test'
-        run: pnpm build
