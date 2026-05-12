@@ -40,7 +40,7 @@ function TCell({
 
 function THead({ children }: { children: React.ReactNode }) {
 	return (
-		<th className="whitespace-nowrap border border-slate-300 bg-slate-100 px-2 py-2 text-center font-semibold text-slate-700 text-xs">
+		<th className="whitespace-wrap border border-slate-300 bg-slate-100 px-2 py-2 text-center font-semibold text-slate-700 text-xs">
 			{children}
 		</th>
 	)
@@ -186,7 +186,7 @@ export function RisultatiStep() {
 			<Card>
 				<CardHeader
 					actions={
-						<div className="flex flex-wrap gap-2">
+						<div className="flex flex-col flex-wrap gap-2 md:flex-row">
 							<Button
 								variant="secondary"
 								size="sm"
@@ -212,10 +212,9 @@ export function RisultatiStep() {
 				<CardContent className="p-0">
 					<div ref={tableRef} className="overflow-x-auto bg-white p-4">
 						<div
-							className="mb-6 flex justify-between border-slate-900 border-b-2 pb-4"
-							style={{ minWidth: '1100px' }}
+							className="flex"
 						>
-							<div className="flex flex-col justify-end">
+							<div className="mb-4 flex flex-col gap-4">
 								<h2 className="font-black text-2xl text-slate-900 uppercase tracking-tighter">
 									Ripartizione Consumo Acqua
 								</h2>
@@ -227,58 +226,58 @@ export function RisultatiStep() {
 										{bolletta.viaCondominio}
 									</p>
 								)}
+								<div className="flex min-w-50 flex-col gap-1 text-right">
+									<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
+										<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+											Bolletta N°
+										</span>
+										<span className="font-bold font-mono text-slate-900 text-xs">
+											{bolletta.numeroBolletta || '—'}
+										</span>
+									</div>
+									<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
+										<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+											Data Documento
+										</span>
+										<span className="font-bold text-slate-900 text-xs">
+											{bolletta.dataDocumento
+												? new Date(bolletta.dataDocumento).toLocaleDateString(
+													'it-IT',
+												)
+												: '—'}
+										</span>
+									</div>
+									<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
+										<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+											Periodo
+										</span>
+										<span className="font-bold text-slate-900 text-xs">
+											{new Date(bolletta.dataInizio).toLocaleDateString('it-IT')}{' '}
+											— {new Date(bolletta.dataFine).toLocaleDateString('it-IT')}
+										</span>
+									</div>
+									<div className="flex justify-between gap-4 py-0.5">
+										<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
+											Scadenza
+										</span>
+										<span className="font-black text-red-600 text-sm">
+											{bolletta.dataScadenza
+												? new Date(bolletta.dataScadenza).toLocaleDateString(
+													'it-IT',
+												)
+												: '—'}
+										</span>
+									</div>
+								</div>
+
 								{bolletta.dataProssimaLettura && (
-									<p className="mt-4 font-medium text-[10px] text-slate-500 uppercase tracking-wide">
+									<p className="font-medium text-[10px] text-slate-500 uppercase tracking-wide">
 										Prossima lettura prevista:{' '}
 										{new Date(bolletta.dataProssimaLettura).toLocaleDateString(
 											'it-IT',
 										)}
 									</p>
 								)}
-							</div>
-
-							<div className="flex min-w-50 flex-col gap-1 text-right">
-								<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
-									<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-										Bolletta N°
-									</span>
-									<span className="font-bold font-mono text-slate-900 text-xs">
-										{bolletta.numeroBolletta || '—'}
-									</span>
-								</div>
-								<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
-									<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-										Data Documento
-									</span>
-									<span className="font-bold text-slate-900 text-xs">
-										{bolletta.dataDocumento
-											? new Date(bolletta.dataDocumento).toLocaleDateString(
-													'it-IT',
-												)
-											: '—'}
-									</span>
-								</div>
-								<div className="flex justify-between gap-4 border-slate-100 border-b py-0.5">
-									<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-										Periodo
-									</span>
-									<span className="font-bold text-slate-900 text-xs">
-										{new Date(bolletta.dataInizio).toLocaleDateString('it-IT')}{' '}
-										— {new Date(bolletta.dataFine).toLocaleDateString('it-IT')}
-									</span>
-								</div>
-								<div className="flex justify-between gap-4 py-0.5">
-									<span className="font-bold text-[10px] text-slate-400 uppercase tracking-wider">
-										Scadenza
-									</span>
-									<span className="font-black text-red-600 text-sm">
-										{bolletta.dataScadenza
-											? new Date(bolletta.dataScadenza).toLocaleDateString(
-													'it-IT',
-												)
-											: '—'}
-									</span>
-								</div>
 							</div>
 						</div>
 						<table
