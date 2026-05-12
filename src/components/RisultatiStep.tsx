@@ -13,6 +13,7 @@ import {
 	CardHeader,
 	CardTitle,
 	Modal,
+	Tooltip,
 } from './ui'
 
 function TCell({
@@ -46,6 +47,12 @@ function THead({ children }: { children: React.ReactNode }) {
 }
 
 function RigaTabella({ riga }: { riga: RigaRisultato }) {
+	const quotaServizioAquedotto =
+		riga.tariffaAgevolata +
+		riga.eccedenzaBase +
+		riga.eccedenzaFascia1 +
+		riga.eccedenzaFascia2 +
+		riga.eccedenzaFascia3
 	const quotaServizi =
 		riga.quotaFogna + riga.quotaDepurazione + riga.quotaPerequazione
 	return (
@@ -68,23 +75,26 @@ function RigaTabella({ riga }: { riga: RigaRisultato }) {
 					: '—'}
 			</TCell>
 			<TCell bold>{riga.consumoReale}</TCell>
-			<TCell>{riga.consumoTotale}</TCell>
+			<TCell highlight>{riga.consumoTotale}</TCell>
 			<TCell>{fmtEur(riga.quotaFissa)}</TCell>
 			<TCell>{fmtEur(riga.tariffaAgevolata)}</TCell>
 			<TCell>{fmtEur(riga.eccedenzaBase)}</TCell>
 			<TCell>{fmtEur(riga.eccedenzaFascia1)}</TCell>
 			<TCell>{fmtEur(riga.eccedenzaFascia2)}</TCell>
 			<TCell>{fmtEur(riga.eccedenzaFascia3)}</TCell>
-			<TCell bold>{fmtEur(quotaServizi)}</TCell>
+			<TCell>{fmtEur(quotaServizioAquedotto)}</TCell>
+			<TCell>{fmtEur(quotaServizi)}</TCell>
 			<TCell bold>{fmtEur(riga.totaleParziale)}</TCell>
 			<TCell>{fmtEur(riga.iva)}</TCell>
 			<TCell>
 				{riga.rettificaAcconti !== 0 ? fmtEur(riga.rettificaAcconti) : '—'}
 			</TCell>
-			<TCell bold>{fmtEur(riga.totaleFatturaAQP)}</TCell>
+			<TCell bold highlight>
+				{fmtEur(riga.totaleFatturaAQP)}
+			</TCell>
 			<TCell>{fmtEur(riga.spesePostali)}</TCell>
-			<TCell>{riga.speseGestione > 0 ? fmtEur(riga.speseGestione) : '—'}</TCell>
 			<TCell highlight>{fmtEur(riga.totaleDaPagare)}</TCell>
+			<TCell>{riga.speseGestione > 0 ? fmtEur(riga.speseGestione) : '—'}</TCell>
 		</tr>
 	)
 }
@@ -109,6 +119,13 @@ export function RisultatiStep() {
 	}
 
 	const t = risultato.totali
+	const totaliServizioAquedotto =
+		t.tariffaAgevolata +
+		t.eccedenzaBase +
+		t.eccedenzaFascia1 +
+		t.eccedenzaFascia2 +
+		t.eccedenzaFascia3
+	const totaliServiziString = `${fmtEur(t.quotaFogna)} / ${fmtEur(t.quotaDepurazione)} / ${fmtEur(t.quotaPerequazione)}`
 	const totaliServizi = t.quotaFogna + t.quotaDepurazione + t.quotaPerequazione
 
 	const handlePreviewPDF = async () => {
@@ -301,14 +318,15 @@ export function RisultatiStep() {
 									<THead>Ecc. 1° F. (€)</THead>
 									<THead>Ecc. 2° F. (€)</THead>
 									<THead>Ecc. 3° F. (€)</THead>
+									<THead>Tot. Parziale (€)</THead>
 									<THead>Fogna/Dep/Per (€)</THead>
 									<THead>Tot. Parziale (€)</THead>
 									<THead>IVA (€)</THead>
-									<THead>Rettifica (€)</THead>
+									<THead>Rettifica / Acconti / Dep. Cauzionale (€)</THead>
 									<THead>Tot. Fattura AQP (€)</THead>
-									<THead>Sp. Postali (€)</THead>
+									<THead>Commissioni / Sp. Postali (€)</THead>
+									<THead>TOTALE DA PAGARE(€)</THead>
 									<THead>Sp. Gestione (€)</THead>
-									<THead>TOTALE (€)</THead>
 								</tr>
 							</thead>
 							<tbody>
@@ -324,14 +342,21 @@ export function RisultatiStep() {
 									<TCell bold>—</TCell>
 									<TCell bold>—</TCell>
 									<TCell bold>{t.consumoReale}</TCell>
-									<TCell bold>{t.consumoTotale}</TCell>
+									<TCell bold highlight>
+										{t.consumoTotale}
+									</TCell>
 									<TCell bold>{fmtEur(t.quotaFissa)}</TCell>
 									<TCell bold>{fmtEur(t.tariffaAgevolata)}</TCell>
 									<TCell bold>{fmtEur(t.eccedenzaBase)}</TCell>
 									<TCell bold>{fmtEur(t.eccedenzaFascia1)}</TCell>
 									<TCell bold>{fmtEur(t.eccedenzaFascia2)}</TCell>
 									<TCell bold>{fmtEur(t.eccedenzaFascia3)}</TCell>
-									<TCell bold>{fmtEur(totaliServizi)}</TCell>
+									<TCell bold>{fmtEur(totaliServizioAquedotto)}</TCell>
+									<TCell bold>
+										<Tooltip content={totaliServiziString} placement="top">
+											{fmtEur(totaliServizi)}
+										</Tooltip>
+									</TCell>
 									<TCell bold>{fmtEur(t.totaleParziale)}</TCell>
 									<TCell bold>{fmtEur(t.iva)}</TCell>
 									<TCell bold>
@@ -339,12 +364,14 @@ export function RisultatiStep() {
 											? fmtEur(t.rettificaAcconti)
 											: '—'}
 									</TCell>
-									<TCell bold>{fmtEur(t.totaleFatturaAQP)}</TCell>
+									<TCell bold highlight>
+										{fmtEur(t.totaleFatturaAQP)}
+									</TCell>
 									<TCell bold>{fmtEur(t.spesePostali)}</TCell>
+									<TCell highlight>{fmtEur(t.totaleDaPagare)}</TCell>
 									<TCell bold>
 										{t.speseGestione > 0 ? fmtEur(t.speseGestione) : '—'}
 									</TCell>
-									<TCell highlight>{fmtEur(t.totaleDaPagare)}</TCell>
 								</tr>
 							</tfoot>
 						</table>
@@ -359,19 +386,11 @@ export function RisultatiStep() {
 									<strong>Consumo reale condomini:</strong>{' '}
 									{risultato.consumoRealeTotale} mc
 								</p>
-								<p
-									className={
-										risultato.discrepanzaElevata
-											? 'font-semibold text-red-600'
-											: ''
-									}
-								>
+								<p>
 									<strong>Discrepanza:</strong>{' '}
 									{risultato.discrepanzaMC > 0 ? '+' : ''}
 									{risultato.discrepanzaMC} mc (
 									{fmt(risultato.discrepanzaPercent, 2)}%)
-									{risultato.discrepanzaElevata &&
-										` ⚠️ ELEVATA (>${bolletta.sogliaDiscrepanza}%)`}
 								</p>
 							</div>
 							<div className="space-y-1">

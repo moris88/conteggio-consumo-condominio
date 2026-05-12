@@ -9,6 +9,7 @@ import { Stepper } from '@/components/ui/Stepper'
 import { useAppStore } from '@/store/useAppStore'
 import type { AppStep } from '@/types'
 import { getConsumoReale } from '@/utils/calcoli'
+import { Tooltip } from './components'
 
 export function App() {
 	const { activeStep, setActiveStep, condomini, bolletta, reset } =
@@ -28,7 +29,7 @@ export function App() {
 	return (
 		<div className="min-h-screen bg-slate-50">
 			<header className="border-slate-200 border-b bg-white shadow-sm">
-				<div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+				<div className="mx-auto flex items-center justify-between px-4 py-4">
 					<div>
 						<h1 className="font-bold text-lg text-slate-900 leading-tight">
 							Gestione Consumo Acqua
@@ -37,23 +38,25 @@ export function App() {
 							Ripartizione spese condominiali
 						</p>
 					</div>
-					<button
-						type="button"
-						onClick={() => {
-							if (
-								confirm(
-									"Vuoi azzerare tutti i dati? L'operazione non è reversibile.",
-								)
-							) {
-								reset()
-							}
-						}}
-						className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-slate-500 text-xs transition-colors hover:bg-slate-100 hover:text-slate-700"
-						title="Azzera tutto"
-					>
-						<RotateRight className="h-3.5 w-3.5" />
-						Reset
-					</button>
+					<Tooltip content="Resetta tutti i dati" placement="left">
+						<button
+							type="button"
+							onClick={() => {
+								if (
+									confirm(
+										"Vuoi azzerare tutti i dati? L'operazione non è reversibile.",
+									)
+								) {
+									reset()
+								}
+							}}
+							className="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-slate-500 text-xs transition-colors hover:bg-slate-100 hover:text-slate-700"
+							title="Azzera tutto"
+						>
+							<RotateRight className="h-3.5 w-3.5" />
+							Reset
+						</button>
+					</Tooltip>
 				</div>
 			</header>
 

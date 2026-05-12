@@ -198,7 +198,7 @@ export function calcolaRisultati(
 			quotaDepurazione +
 			quotaPerequazione
 
-		const totaleFatturaAQP = totaleParziale + iva - rettificaAcconti
+		const totaleFatturaAQP = totaleParziale + iva + rettificaAcconti
 
 		return {
 			condomino,
@@ -220,7 +220,7 @@ export function calcolaRisultati(
 			totaleFatturaAQP,
 			spesePostali,
 			speseGestione,
-			totaleDaPagare: totaleFatturaAQP + spesePostali + speseGestione,
+			totaleDaPagare: totaleFatturaAQP + spesePostali,
 			isNonResidente: false,
 		}
 	})
