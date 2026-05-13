@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { ConsumiStep } from '@/components/ConsumiStep'
 import { useAppStore } from '@/store/useAppStore'
@@ -34,5 +34,66 @@ describe('ConsumiStep', () => {
 		expect(useAppStore.getState().condomini[0].letturaPrecedente).toBe(50)
 		expect(useAppStore.getState().condomini[0].letturaAttuale).toBe(60)
 		expect(screen.getByText('10 mc')).toBeDefined()
+	})
+
+	it('permette di tornare allo step precedente', () => {
+		act(() => {
+			const store = useAppStore.getState()
+			store.addCondomino({
+				nome: 'A',
+				cognome: 'B',
+				appartamento: '1',
+				tipo: 'proprietario-residente',
+			})
+			store.setBolletta({ ...store.bolletta, consumoTotale: 100 })
+		})
+
+		render(<ConsumiStep />)
+
+		fireEvent.click(screen.getByText('← Bolletta'))
+		expect(useAppStore.getState().activeStep).toBe('bolletta')
+	})
+
+	it('permette di procedere allo step successivo', () => {
+		act(() => {
+			const store = useAppStore.getState()
+			store.addCondomino({
+				nome: 'A',
+				cognome: 'B',
+				appartamento: '1',
+				tipo: 'proprietario-residente',
+			})
+			store.setBolletta({ ...store.bolletta, consumoTotale: 100 })
+			store.setActiveStep('consumi')
+		})
+
+		render(<ConsumiStep />)
+
+		fireEvent.click(screen.getByText('Calcola Risultati →'))
+		expect(useAppStore.getState().activeStep).toBe('risultati')
+	})
+
+	it('aggiorna le soglie e quote minime', () => {
+		act(() => {
+			const store = useAppStore.getState()
+			store.addCondomino({
+				nome: 'A',
+				cognome: 'B',
+				appartamento: '1',
+				tipo: 'proprietario-residente',
+			})
+		})
+
+		render(<ConsumiStep />)
+
+		const select = screen.getByLabelText(/Soglia discrepanza/i)
+		fireEvent.change(select, { target: { value: '20' } })
+
+		expect(useAppStore.getState().bolletta.sogliaDiscrepanza).toBe(20)
+
+		const quotaMin = screen.getByLabelText(/Quota minima tariffa agevolata/i)
+		fireEvent.change(quotaMin, { target: { value: '15' } })
+
+		expect(useAppStore.getState().bolletta.tariffaAgevolataMin).toBe(15)
 	})
 })

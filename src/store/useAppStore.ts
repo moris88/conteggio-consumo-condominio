@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import type { AppStep, BollettaAcqua, Condomino } from '@/types'
+import type { AppStep, BollettaAcqua, BollettaLuce, Condomino } from '@/types'
 
 const oggi = new Date().toISOString().split('T')[0]
 const treMesiFa = new Date()
@@ -23,6 +23,11 @@ export const BOLLETTA_DEFAULT: BollettaAcqua = {
 	eccedenzaFascia1: 0,
 	eccedenzaFascia2: 0,
 	eccedenzaFascia3: 0,
+	tariffaAgevolataMin: 0,
+	eccedenzaBaseMin: 0,
+	eccedenzaFascia1Min: 0,
+	eccedenzaFascia2Min: 0,
+	eccedenzaFascia3Min: 0,
 	quotaFogna: 0,
 	quotaDepurazione: 0,
 	quotaPerequazione: 0,
@@ -32,9 +37,23 @@ export const BOLLETTA_DEFAULT: BollettaAcqua = {
 	speseGestione: 0,
 }
 
+export const BOLLETTA_LUCE_DEFAULT: BollettaLuce = {
+	dataInizio: treMesiFa.toISOString().split('T')[0],
+	dataFine: oggi,
+	dataScadenza: '',
+	numeroBolletta: '',
+	viaCondominio: '',
+	dataDocumento: oggi,
+	totaleBolletta: 0,
+	spesePostali: 0,
+	speseGestione: 0,
+}
+
 interface AppStore {
 	condomini: Condomino[]
 	bolletta: BollettaAcqua
+	bollettaLuce: BollettaLuce
+	type: 'acqua' | 'luce'
 	activeStep: AppStep
 	addCondomino: (
 		data: Omit<Condomino, 'id' | 'letturaAttuale' | 'letturaPrecedente'>,
@@ -43,6 +62,8 @@ interface AppStore {
 	deleteCondomino: (id: string) => void
 	setCondomini: (condomini: Condomino[]) => void
 	setBolletta: (bolletta: BollettaAcqua) => void
+	setBollettaLuce: (bolletta: BollettaLuce) => void
+	setType: (type: 'acqua' | 'luce') => void
 	setActiveStep: (step: AppStep) => void
 	reset: () => void
 }
@@ -52,6 +73,8 @@ export const useAppStore = create<AppStore>()(
 		(set) => ({
 			condomini: [],
 			bolletta: BOLLETTA_DEFAULT,
+			bollettaLuce: BOLLETTA_LUCE_DEFAULT,
+			type: 'acqua',
 			activeStep: 'condomini',
 
 			addCondomino: (data) =>
@@ -83,12 +106,17 @@ export const useAppStore = create<AppStore>()(
 
 			setBolletta: (bolletta) => set({ bolletta }),
 
+			setBollettaLuce: (bollettaLuce) => set({ bollettaLuce }),
+
 			setActiveStep: (activeStep) => set({ activeStep }),
+
+			setType: (type) => set({ type, activeStep: 'condomini' }),
 
 			reset: () =>
 				set({
 					condomini: [],
 					bolletta: BOLLETTA_DEFAULT,
+					bollettaLuce: BOLLETTA_LUCE_DEFAULT,
 					activeStep: 'condomini',
 				}),
 		}),

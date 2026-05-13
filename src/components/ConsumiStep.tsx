@@ -62,7 +62,7 @@ export function ConsumiStep() {
 					<CardTitle>Configurazione e Letture</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					<div className="px-5 pt-4">
+					<div className="flex flex-col gap-4 px-5 pt-4">
 						<Select
 							label="Soglia discrepanza elevata"
 							options={SOGLIE_DISCREPANZA}
@@ -73,8 +73,73 @@ export function ConsumiStep() {
 									sogliaDiscrepanza: Number.parseInt(e.target.value, 10),
 								})
 							}
-							className="max-w-xs"
 						/>
+						<NumberInput
+							label="Quota minima tariffa agevolata"
+							value={bolletta.tariffaAgevolataMin}
+							onChange={(v) =>
+								setBolletta({
+									...bolletta,
+									tariffaAgevolataMin: v,
+								})
+							}
+							suffix="mc"
+							min={0}
+						/>
+						<NumberInput
+							label="Quota minima tariffa base"
+							value={bolletta.eccedenzaBaseMin}
+							onChange={(v) =>
+								setBolletta({
+									...bolletta,
+									eccedenzaBaseMin: v,
+								})
+							}
+							suffix="mc"
+							min={0}
+						/>
+						{bolletta.eccedenzaFascia1 > 0 && (
+							<NumberInput
+								label="Quota minima tariffa fascia 1"
+								value={bolletta.eccedenzaFascia1Min}
+								onChange={(v) =>
+									setBolletta({
+										...bolletta,
+										eccedenzaFascia1Min: v,
+									})
+								}
+								suffix="mc"
+								min={0}
+							/>
+						)}
+						{bolletta.eccedenzaFascia2 > 0 && (
+							<NumberInput
+								label="Quota minima tariffa fascia 2"
+								value={bolletta.eccedenzaFascia2Min}
+								onChange={(v) =>
+									setBolletta({
+										...bolletta,
+										eccedenzaFascia2Min: v,
+									})
+								}
+								suffix="mc"
+								min={0}
+							/>
+						)}
+						{bolletta.eccedenzaFascia3 > 0 && (
+							<NumberInput
+								label="Quota minima tariffa fascia 3"
+								value={bolletta.eccedenzaFascia3Min}
+								onChange={(v) =>
+									setBolletta({
+										...bolletta,
+										eccedenzaFascia3Min: v,
+									})
+								}
+								suffix="mc"
+								min={0}
+							/>
+						)}
 					</div>
 
 					<Separator />
