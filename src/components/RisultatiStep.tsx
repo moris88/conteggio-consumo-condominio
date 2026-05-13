@@ -139,8 +139,11 @@ function RigaTabellaLuce({ riga }: { riga: RigaRisultato }) {
 }
 
 export function RisultatiStep() {
-	const { condomini, bolletta, bollettaLuce, type, setActiveStep } =
-		useAppStore()
+	const type = useAppStore((s) => s.type)
+	const condomini = useAppStore((s) =>
+		type === 'acqua' ? s.condominiAcqua : s.condominiLuce,
+	)
+	const { bolletta, bollettaLuce, setActiveStep } = useAppStore()
 	const tableRef = useRef<HTMLDivElement>(null)
 	const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 	const [loadingPdf, setLoadingPdf] = useState(false)

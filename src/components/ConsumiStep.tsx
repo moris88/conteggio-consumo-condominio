@@ -17,7 +17,11 @@ import {
 } from './ui'
 
 export function ConsumiStep() {
-	const { condomini, bolletta, setBolletta, updateCondomino, setActiveStep } =
+	const type = useAppStore((s) => s.type)
+	const condomini = useAppStore((s) =>
+		type === 'acqua' ? s.condominiAcqua : s.condominiLuce,
+	)
+	const { bolletta, setBolletta, updateCondomino, setActiveStep } =
 		useAppStore()
 
 	if (condomini.length === 0) {

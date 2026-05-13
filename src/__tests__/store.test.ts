@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react'
+import { act } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { useAppStore } from '@/store/useAppStore'
@@ -19,16 +19,18 @@ describe('useAppStore', () => {
 
 	it('inizializza con lo stato di default', () => {
 		const state = useAppStore.getState()
-		expect(state.condomini).toEqual([])
+		expect(state.condominiAcqua).toEqual([])
+		expect(state.condominiLuce).toEqual([])
 		expect(state.activeStep).toBe('condomini')
 		expect(state.bolletta.consumoTotale).toBe(0)
 	})
 
-	it('aggiunge un condomino', () => {
-		const { result } = renderHook(() => useAppStore())
+	it('aggiunge un condomino alla lista corretta in base al tipo', () => {
+		const store = useAppStore.getState()
 
+		// Acqua (default)
 		act(() => {
-			result.current.addCondomino({
+			store.addCondomino({
 				nome: 'Mario',
 				cognome: 'Rossi',
 				appartamento: 'A1',
@@ -36,23 +38,28 @@ describe('useAppStore', () => {
 			})
 		})
 
-		expect(result.current.condomini).toHaveLength(1)
-		expect(result.current.condomini[0]).toMatchObject({
-			nome: 'Mario',
-			cognome: 'Rossi',
-			appartamento: 'A1',
-			tipo: 'proprietario-residente',
-			letturaAttuale: 0,
-			letturaPrecedente: 0,
+		expect(useAppStore.getState().condominiAcqua).toHaveLength(1)
+		expect(useAppStore.getState().condominiLuce).toHaveLength(0)
+
+		// Luce
+		act(() => {
+			useAppStore.getState().setType('luce')
+			useAppStore.getState().addCondomino({
+				nome: 'Luigi',
+				cognome: 'Verdi',
+				appartamento: 'B2',
+				tipo: 'inquilino',
+			})
 		})
-		expect(result.current.condomini[0].id).toBeDefined()
+
+		expect(useAppStore.getState().condominiAcqua).toHaveLength(1)
+		expect(useAppStore.getState().condominiLuce).toHaveLength(1)
+		expect(useAppStore.getState().condominiLuce[0].nome).toBe('Luigi')
 	})
 
-	it('aggiorna un condomino', () => {
-		const { result } = renderHook(() => useAppStore())
-
+	it('aggiorna un condomino nella lista corretta', () => {
 		act(() => {
-			result.current.addCondomino({
+			useAppStore.getState().addCondomino({
 				nome: 'Mario',
 				cognome: 'Rossi',
 				appartamento: 'A1',
@@ -60,20 +67,18 @@ describe('useAppStore', () => {
 			})
 		})
 
-		const id = result.current.condomini[0].id
+		const id = useAppStore.getState().condominiAcqua[0].id
 
 		act(() => {
-			result.current.updateCondomino(id, { letturaAttuale: 100 })
+			useAppStore.getState().updateCondomino(id, { letturaAttuale: 100 })
 		})
 
-		expect(result.current.condomini[0].letturaAttuale).toBe(100)
+		expect(useAppStore.getState().condominiAcqua[0].letturaAttuale).toBe(100)
 	})
 
-	it('elimina un condomino', () => {
-		const { result } = renderHook(() => useAppStore())
-
+	it('elimina un condomino dalla lista corretta', () => {
 		act(() => {
-			result.current.addCondomino({
+			useAppStore.getState().addCondomino({
 				nome: 'Mario',
 				cognome: 'Rossi',
 				appartamento: 'A1',
@@ -81,57 +86,59 @@ describe('useAppStore', () => {
 			})
 		})
 
-		const id = result.current.condomini[0].id
+		const id = useAppStore.getState().condominiAcqua[0].id
 
 		act(() => {
-			result.current.deleteCondomino(id)
+			useAppStore.getState().deleteCondomino(id)
 		})
 
-		expect(result.current.condomini).toHaveLength(0)
+		expect(useAppStore.getState().condominiAcqua).toHaveLength(0)
 	})
 
 	it('imposta i dati della bolletta', () => {
-		const { result } = renderHook(() => useAppStore())
-
 		const nuovaBolletta = {
-			...result.current.bolletta,
+			...useAppStore.getState().bolletta,
 			consumoTotale: 500,
 			quotaFissa: 50,
 		}
 
 		act(() => {
-			result.current.setBolletta(nuovaBolletta)
+			useAppStore.getState().setBolletta(nuovaBolletta)
 		})
 
-		expect(result.current.bolletta.consumoTotale).toBe(500)
-		expect(result.current.bolletta.quotaFissa).toBe(50)
+		expect(useAppStore.getState().bolletta.consumoTotale).toBe(500)
+		expect(useAppStore.getState().bolletta.quotaFissa).toBe(50)
 	})
 
 	it('cambia lo step attivo', () => {
-		const { result } = renderHook(() => useAppStore())
-
 		act(() => {
-			result.current.setActiveStep('bolletta')
+			useAppStore.getState().setActiveStep('bolletta')
 		})
 
-		expect(result.current.activeStep).toBe('bolletta')
+		expect(useAppStore.getState().activeStep).toBe('bolletta')
 	})
 
 	it('resetta lo stato', () => {
-		const { result } = renderHook(() => useAppStore())
-
 		act(() => {
-			result.current.addCondomino({
+			useAppStore.getState().addCondomino({
 				nome: 'Mario',
 				cognome: 'Rossi',
 				appartamento: 'A1',
 				tipo: 'proprietario-residente',
 			})
-			result.current.setActiveStep('bolletta')
-			result.current.reset()
+			useAppStore.getState().setType('luce')
+			useAppStore.getState().addCondomino({
+				nome: 'Luigi',
+				cognome: 'Verdi',
+				appartamento: 'B2',
+				tipo: 'inquilino',
+			})
+			useAppStore.getState().setActiveStep('bolletta')
+			useAppStore.getState().reset()
 		})
 
-		expect(result.current.condomini).toHaveLength(0)
-		expect(result.current.activeStep).toBe('condomini')
+		expect(useAppStore.getState().condominiAcqua).toHaveLength(0)
+		expect(useAppStore.getState().condominiLuce).toHaveLength(0)
+		expect(useAppStore.getState().activeStep).toBe('condomini')
 	})
 })

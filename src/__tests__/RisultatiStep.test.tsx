@@ -56,7 +56,7 @@ describe('RisultatiStep', () => {
 			})
 		})
 
-		const id = useAppStore.getState().condomini[0].id
+		const id = useAppStore.getState().condominiAcqua[0].id
 
 		act(() => {
 			useAppStore
@@ -94,7 +94,7 @@ describe('RisultatiStep', () => {
 			})
 			useAppStore
 				.getState()
-				.updateCondomino(useAppStore.getState().condomini[0].id, {
+				.updateCondomino(useAppStore.getState().condominiAcqua[0].id, {
 					letturaPrecedente: 10,
 					letturaAttuale: 20,
 				})

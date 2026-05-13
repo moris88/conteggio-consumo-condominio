@@ -15,16 +15,12 @@ import { getConsumoReale } from '@/utils/calcoli'
 import { Tooltip } from './components'
 
 export function App() {
-	const {
-		activeStep,
-		setActiveStep,
-		condomini,
-		bolletta,
-		bollettaLuce,
-		reset,
-		setType,
-		type,
-	} = useAppStore()
+	const type = useAppStore((s) => s.type)
+	const condomini = useAppStore((s) =>
+		type === 'acqua' ? s.condominiAcqua : s.condominiLuce,
+	)
+	const { activeStep, setActiveStep, bolletta, bollettaLuce, reset, setType } =
+		useAppStore()
 
 	const isAcqua = type === 'acqua'
 

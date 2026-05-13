@@ -136,8 +136,11 @@ function EditModal({ condomino, onSave, onClose }: EditModalProps) {
 }
 
 export function CondominiStep() {
+	const type = useAppStore((s) => s.type)
+	const condomini = useAppStore((s) =>
+		type === 'acqua' ? s.condominiAcqua : s.condominiLuce,
+	)
 	const {
-		condomini,
 		addCondomino,
 		updateCondomino,
 		deleteCondomino,

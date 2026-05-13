@@ -50,7 +50,8 @@ export const BOLLETTA_LUCE_DEFAULT: BollettaLuce = {
 }
 
 interface AppStore {
-	condomini: Condomino[]
+	condominiAcqua: Condomino[]
+	condominiLuce: Condomino[]
 	bolletta: BollettaAcqua
 	bollettaLuce: BollettaLuce
 	type: 'acqua' | 'luce'
@@ -62,7 +63,7 @@ interface AppStore {
 	deleteCondomino: (id: string) => void
 	setCondomini: (condomini: Condomino[]) => void
 	setBolletta: (bolletta: BollettaAcqua) => void
-	setBollettaLuce: (bolletta: BollettaLuce) => void
+	setBollettaLuce: (bollettaLuce: BollettaLuce) => void
 	setType: (type: 'acqua' | 'luce') => void
 	setActiveStep: (step: AppStep) => void
 	reset: () => void
@@ -71,38 +72,52 @@ interface AppStore {
 export const useAppStore = create<AppStore>()(
 	persist(
 		(set) => ({
-			condomini: [],
+			condominiAcqua: [],
+			condominiLuce: [],
 			bolletta: BOLLETTA_DEFAULT,
 			bollettaLuce: BOLLETTA_LUCE_DEFAULT,
 			type: 'acqua',
 			activeStep: 'condomini',
 
 			addCondomino: (data) =>
-				set((state) => ({
-					condomini: [
-						...state.condomini,
-						{
-							...data,
-							id: crypto.randomUUID(),
-							letturaAttuale: 0,
-							letturaPrecedente: 0,
-						},
-					],
-				})),
+				set((state) => {
+					const key = state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
+					return {
+						[key]: [
+							...state[key],
+							{
+								...data,
+								id: crypto.randomUUID(),
+								letturaAttuale: 0,
+								letturaPrecedente: 0,
+							},
+						],
+					}
+				}),
 
 			updateCondomino: (id, updates) =>
-				set((state) => ({
-					condomini: state.condomini.map((c) =>
-						c.id === id ? { ...c, ...updates } : c,
-					),
-				})),
+				set((state) => {
+					const key = state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
+					return {
+						[key]: state[key].map((c: Condomino) =>
+							c.id === id ? { ...c, ...updates } : c,
+						),
+					}
+				}),
 
 			deleteCondomino: (id) =>
-				set((state) => ({
-					condomini: state.condomini.filter((c) => c.id !== id),
-				})),
+				set((state) => {
+					const key = state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
+					return {
+						[key]: state[key].filter((c: Condomino) => c.id !== id),
+					}
+				}),
 
-			setCondomini: (condomini) => set({ condomini }),
+			setCondomini: (condomini) =>
+				set((state) => {
+					const key = state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
+					return { [key]: condomini }
+				}),
 
 			setBolletta: (bolletta) => set({ bolletta }),
 
@@ -114,12 +129,27 @@ export const useAppStore = create<AppStore>()(
 
 			reset: () =>
 				set({
-					condomini: [],
+					condominiAcqua: [],
+					condominiLuce: [],
 					bolletta: BOLLETTA_DEFAULT,
 					bollettaLuce: BOLLETTA_LUCE_DEFAULT,
+					type: 'acqua',
 					activeStep: 'condomini',
 				}),
 		}),
-		{ name: 'condominio-acqua-v2' },
+		{
+			name: 'condominio-acqua-v3',
+			version: 3,
+			migrate: (persistedState: any, version: number) => {
+				if (version < 3 && persistedState && persistedState.condomini) {
+					return {
+						...persistedState,
+						condominiAcqua: persistedState.condomini,
+						condominiLuce: persistedState.condomini,
+					}
+				}
+				return persistedState
+			},
+		},
 	),
 )

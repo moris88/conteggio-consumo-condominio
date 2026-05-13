@@ -24,7 +24,7 @@ describe('CondominiStep', () => {
 
 		expect(screen.getByText('Rossi')).toBeDefined()
 		expect(screen.getByText('A1')).toBeDefined()
-		expect(useAppStore.getState().condomini).toHaveLength(1)
+		expect(useAppStore.getState().condominiAcqua).toHaveLength(1)
 	})
 
 	it('permette di eliminare un condomino', async () => {
@@ -57,7 +57,7 @@ describe('CondominiStep', () => {
 			})
 		}
 
-		expect(useAppStore.getState().condomini).toHaveLength(0)
+		expect(useAppStore.getState().condominiAcqua).toHaveLength(0)
 	})
 
 	it('permette di iniziare la modifica di un condomino', async () => {
@@ -149,7 +149,7 @@ describe('CondominiStep', () => {
 		fireEvent.change(input, { target: { files: [file] } })
 
 		await vi.waitFor(() =>
-			expect(useAppStore.getState().condomini).toHaveLength(1),
+			expect(useAppStore.getState().condominiAcqua).toHaveLength(1),
 		)
 	})
 })
