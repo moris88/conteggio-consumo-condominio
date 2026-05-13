@@ -1,8 +1,45 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { BollettaAcqua, RisultatoCalcolo } from '@/types'
-import { exportToCSV } from '@/utils/esporta'
+import { exportToCSV, exportToPDF, generatePDFBlobUrl } from '@/utils/esporta'
+
+// Mock modern-screenshot
+vi.mock('modern-screenshot', () => ({
+	domToCanvas: vi.fn().mockResolvedValue({
+		width: 1000,
+		height: 1000,
+		toDataURL: vi.fn().mockReturnValue('data:image/png;base64,abc'),
+	}),
+}))
+
+const { mockSave, mockAddImage, mockOutput, MockJsPDF } = vi.hoisted(() => {
+	const save = vi.fn()
+	const addImage = vi.fn()
+	const output = vi.fn().mockReturnValue(new Blob())
+
+	class MockJsPDF {
+		internal = {
+			pageSize: {
+				getWidth: () => 210,
+				getHeight: () => 297,
+			},
+		}
+		addImage = addImage
+		save = save
+		output = output
+	}
+
+	return { mockSave: save, mockAddImage: addImage, mockOutput: output, MockJsPDF }
+})
+
+vi.mock('jspdf', () => ({
+	default: MockJsPDF,
+}))
 
 describe('esporta utility', () => {
+	beforeEach(() => {
+		vi.clearAllMocks()
+	})
+
 	it('exportToCSV genera un file scaricabile', () => {
 		// Mock URL.createObjectURL e document.createElement
 		const createObjectURLMock = vi.fn(() => 'blob-url')
@@ -116,4 +153,61 @@ describe('esporta utility', () => {
 		expect(link.click).toHaveBeenCalled()
 		expect(revokeObjectURLMock).toHaveBeenCalled()
 	})
+
+	it('exportToPDF chiama le funzioni di generazione PDF', async () => {
+		const mockElement = {
+			classList: {
+				add: vi.fn(),
+				remove: vi.fn(),
+			},
+			scrollWidth: 1000,
+			scrollHeight: 1000,
+		}
+		const mockRef = {
+			current: mockElement,
+		}
+
+		await exportToPDF(mockRef as any, '2025-05-13')
+
+		expect(mockElement.classList.add).toHaveBeenCalledWith('pdf-export-mode')
+		expect(mockAddImage).toHaveBeenCalled()
+		expect(mockSave).toHaveBeenCalledWith('ripartizione-acqua-2025-05-13.pdf')
+		expect(mockElement.classList.remove).toHaveBeenCalledWith('pdf-export-mode')
+	})
+
+	it('generatePDFBlobUrl restituisce un URL blob', async () => {
+		const createObjectURLMock = vi.fn(() => 'blob-url')
+		globalThis.URL.createObjectURL = createObjectURLMock
+
+		const mockElement = {
+			classList: {
+				add: vi.fn(),
+				remove: vi.fn(),
+			},
+			scrollWidth: 1000,
+			scrollHeight: 1000,
+		}
+		const mockRef = {
+			current: mockElement,
+		}
+
+		const url = await generatePDFBlobUrl(mockRef as any)
+
+		expect(url).toBe('blob-url')
+		expect(mockOutput).toHaveBeenCalledWith('blob')
+		expect(mockElement.classList.remove).toHaveBeenCalledWith('pdf-export-mode')
+	})
+
+	it('exportToPDF non fa nulla se ref è null', async () => {
+		const mockRef = { current: null }
+		await exportToPDF(mockRef as any, 'date')
+		expect(mockSave).not.toHaveBeenCalled()
+	})
+
+	it('generatePDFBlobUrl restituisce null se ref è null', async () => {
+		const mockRef = { current: null }
+		const url = await generatePDFBlobUrl(mockRef as any)
+		expect(url).toBeNull()
+	})
 })
+

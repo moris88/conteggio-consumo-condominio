@@ -1,5 +1,6 @@
 import type {
 	BollettaAcqua,
+	BollettaLuce,
 	Condomino,
 	RigaRisultato,
 	RisultatoCalcolo,
@@ -129,13 +130,12 @@ export function calcolaRisultati(
 				quotaFogna: 0,
 				quotaDepurazione: 0,
 				quotaPerequazione: 0,
-				totaleParziale: quotaFissa,
 				iva,
 				rettificaAcconti: 0,
 				totaleFatturaAQP,
 				spesePostali,
-				speseGestione: 0,
-				totaleDaPagare: totaleFatturaAQP + spesePostali,
+				speseGestione,
+				totaleDaPagare: totaleFatturaAQP + spesePostali + speseGestione,
 				isNonResidente: true,
 			}
 		}
@@ -214,13 +214,12 @@ export function calcolaRisultati(
 			quotaFogna,
 			quotaDepurazione,
 			quotaPerequazione,
-			totaleParziale,
 			iva,
 			rettificaAcconti,
 			totaleFatturaAQP,
 			spesePostali,
 			speseGestione,
-			totaleDaPagare: totaleFatturaAQP + spesePostali,
+			totaleDaPagare: totaleFatturaAQP + spesePostali + speseGestione,
 			isNonResidente: false,
 		}
 	})
@@ -228,21 +227,21 @@ export function calcolaRisultati(
 	// 4. Calcolo dei totali generali per il riepilogo
 	const totali = righe.reduce<TotaliRisultato>(
 		(acc, r) => ({
-			consumoReale: acc.consumoReale + r.consumoReale,
-			consumoTotale: acc.consumoTotale + r.consumoTotale,
-			quotaFissa: acc.quotaFissa + r.quotaFissa,
-			tariffaAgevolata: acc.tariffaAgevolata + r.tariffaAgevolata,
-			eccedenzaBase: acc.eccedenzaBase + r.eccedenzaBase,
-			eccedenzaFascia1: acc.eccedenzaFascia1 + r.eccedenzaFascia1,
-			eccedenzaFascia2: acc.eccedenzaFascia2 + r.eccedenzaFascia2,
-			eccedenzaFascia3: acc.eccedenzaFascia3 + r.eccedenzaFascia3,
-			quotaFogna: acc.quotaFogna + r.quotaFogna,
-			quotaDepurazione: acc.quotaDepurazione + r.quotaDepurazione,
-			quotaPerequazione: acc.quotaPerequazione + r.quotaPerequazione,
-			totaleParziale: acc.totaleParziale + r.totaleParziale,
-			iva: acc.iva + r.iva,
-			rettificaAcconti: acc.rettificaAcconti + r.rettificaAcconti,
-			totaleFatturaAQP: acc.totaleFatturaAQP + r.totaleFatturaAQP,
+			consumoReale: (acc.consumoReale || 0) + (r.consumoReale || 0),
+			consumoTotale: (acc.consumoTotale || 0) + (r.consumoTotale || 0),
+			quotaFissa: (acc.quotaFissa || 0) + (r.quotaFissa || 0),
+			tariffaAgevolata: (acc.tariffaAgevolata || 0) + (r.tariffaAgevolata || 0),
+			eccedenzaBase: (acc.eccedenzaBase || 0) + (r.eccedenzaBase || 0),
+			eccedenzaFascia1: (acc.eccedenzaFascia1 || 0) + (r.eccedenzaFascia1 || 0),
+			eccedenzaFascia2: (acc.eccedenzaFascia2 || 0) + (r.eccedenzaFascia2 || 0),
+			eccedenzaFascia3: (acc.eccedenzaFascia3 || 0) + (r.eccedenzaFascia3 || 0),
+			quotaFogna: (acc.quotaFogna || 0) + (r.quotaFogna || 0),
+			quotaDepurazione: (acc.quotaDepurazione || 0) + (r.quotaDepurazione || 0),
+			quotaPerequazione:
+				(acc.quotaPerequazione || 0) + (r.quotaPerequazione || 0),
+			iva: (acc.iva || 0) + (r.iva || 0),
+			rettificaAcconti: (acc.rettificaAcconti || 0) + (r.rettificaAcconti || 0),
+			totaleFatturaAQP: (acc.totaleFatturaAQP || 0) + (r.totaleFatturaAQP || 0),
 			spesePostali: acc.spesePostali + r.spesePostali,
 			speseGestione: acc.speseGestione + r.speseGestione,
 			totaleDaPagare: acc.totaleDaPagare + r.totaleDaPagare,
@@ -259,7 +258,6 @@ export function calcolaRisultati(
 			quotaFogna: 0,
 			quotaDepurazione: 0,
 			quotaPerequazione: 0,
-			totaleParziale: 0,
 			iva: 0,
 			rettificaAcconti: 0,
 			totaleFatturaAQP: 0,
@@ -283,6 +281,42 @@ export function calcolaRisultati(
 		discrepanzaMC,
 		discrepanzaPercent,
 		discrepanzaElevata,
+		totali,
+	}
+}
+
+export function calcolaRisultatiLuce(
+	condomini: Condomino[],
+	bolletta: BollettaLuce,
+): RisultatoCalcolo {
+	const n = Math.max(1, condomini.length)
+	const quotaBase = bolletta.totaleBolletta / n
+	const spesePostali = bolletta.spesePostali / n
+	const speseGestione = bolletta.speseGestione / n
+
+	const righe: RigaRisultato[] = condomini.map((condomino) => ({
+		condomino,
+		quotaBase,
+		spesePostali,
+		speseGestione,
+		totaleDaPagare: quotaBase + spesePostali + speseGestione,
+	}))
+
+	const totali: TotaliRisultato = {
+		quotaBase: bolletta.totaleBolletta,
+		spesePostali: bolletta.spesePostali,
+		speseGestione: bolletta.speseGestione,
+		totaleDaPagare:
+			bolletta.totaleBolletta + bolletta.spesePostali + bolletta.speseGestione,
+	}
+
+	return {
+		righe,
+		consumoRealeTotale: 0,
+		consumoBolletta: 0,
+		discrepanzaMC: 0,
+		discrepanzaPercent: 0,
+		discrepanzaElevata: false,
 		totali,
 	}
 }

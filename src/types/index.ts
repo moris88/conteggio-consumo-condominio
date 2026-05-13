@@ -49,46 +49,62 @@ export interface BollettaAcqua {
 	speseGestione: number
 }
 
+export interface BollettaLuce {
+	dataInizio: string
+	dataFine: string
+	dataScadenza: string
+	numeroBolletta: string
+	viaCondominio: string
+	dataDocumento: string
+	totaleBolletta: number
+	spesePostali: number
+	speseGestione: number
+}
+
 export interface RigaRisultato {
 	condomino: Condomino
-	consumoReale: number
-	consumoTotale: number
-	coeffProporzionale: number
-	quotaFissa: number
-	tariffaAgevolata: number
-	eccedenzaBase: number
-	eccedenzaFascia1: number
-	eccedenzaFascia2: number
-	eccedenzaFascia3: number
-	quotaFogna: number
-	quotaDepurazione: number
-	quotaPerequazione: number
-	totaleParziale: number
-	iva: number
-	rettificaAcconti: number
-	totaleFatturaAQP: number
+	// Campi Acqua
+	consumoReale?: number
+	consumoTotale?: number
+	coeffProporzionale?: number
+	quotaFissa?: number
+	tariffaAgevolata?: number
+	eccedenzaBase?: number
+	eccedenzaFascia1?: number
+	eccedenzaFascia2?: number
+	eccedenzaFascia3?: number
+	quotaFogna?: number
+	quotaDepurazione?: number
+	quotaPerequazione?: number
+	iva?: number
+	rettificaAcconti?: number
+	totaleFatturaAQP?: number
+	// Campi Luce / Comuni
+	quotaBase?: number
 	spesePostali: number
 	speseGestione: number
 	totaleDaPagare: number
-	isNonResidente: boolean
+	isNonResidente?: boolean
 }
 
 export interface TotaliRisultato {
-	consumoReale: number
-	consumoTotale: number
-	quotaFissa: number
-	tariffaAgevolata: number
-	eccedenzaBase: number
-	eccedenzaFascia1: number
-	eccedenzaFascia2: number
-	eccedenzaFascia3: number
-	quotaFogna: number
-	quotaDepurazione: number
-	quotaPerequazione: number
-	totaleParziale: number
-	iva: number
-	rettificaAcconti: number
-	totaleFatturaAQP: number
+	// Campi Acqua
+	consumoReale?: number
+	consumoTotale?: number
+	quotaFissa?: number
+	tariffaAgevolata?: number
+	eccedenzaBase?: number
+	eccedenzaFascia1?: number
+	eccedenzaFascia2?: number
+	eccedenzaFascia3?: number
+	quotaFogna?: number
+	quotaDepurazione?: number
+	quotaPerequazione?: number
+	iva?: number
+	rettificaAcconti?: number
+	totaleFatturaAQP?: number
+	// Campi Luce / Comuni
+	quotaBase?: number
 	spesePostali: number
 	speseGestione: number
 	totaleDaPagare: number

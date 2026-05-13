@@ -1,4 +1,5 @@
 export * from './BollettaStep'
+export * from './BollettaLuceStep'
 export * from './CondominiStep'
 export * from './ConsumiStep'
 export * from './RisultatiStep'

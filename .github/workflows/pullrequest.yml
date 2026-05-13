@@ -52,7 +52,7 @@ jobs:
             const path = require('path')
 
             const COMMENT_MARKER = '<!-- coverage-report -->'
-            const THRESHOLD = 50
+            const THRESHOLD = 70
             const summaryPath = path.join(process.cwd(), 'coverage', 'coverage-summary.json')
             const pr = context.issue.number
             const timestamp = new Date().toUTCString()

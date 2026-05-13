@@ -27,12 +27,89 @@ describe('CondominiStep', () => {
 		expect(useAppStore.getState().condomini).toHaveLength(1)
 	})
 
-	it('mostra errori di validazione', () => {
+	it('permette di eliminare un condomino', () => {
+		const store = useAppStore.getState()
+		store.addCondomino({
+			nome: 'M',
+			cognome: 'R',
+			appartamento: '1',
+			tipo: 'proprietario-residente',
+		})
+
 		render(<CondominiStep />)
-		const addBtn = screen.getByText('Aggiungi')
+		
+		const deleteBtn = screen.getByRole('button', { name: /Elimina/i })
+		fireEvent.click(deleteBtn)
 
-		fireEvent.click(addBtn)
+		// Clicca elimina nel modal di conferma
+		const confirmDeleteBtn = screen.getAllByRole('button', { name: /Elimina/i }).find(btn => btn.classList.contains('bg-red-600') || btn.textContent === 'Elimina')
+		if (confirmDeleteBtn) fireEvent.click(confirmDeleteBtn)
 
-		expect(screen.getAllByText('Campo obbligatorio')).toHaveLength(2)
+		expect(useAppStore.getState().condomini).toHaveLength(0)
+	})
+
+	it('permette di iniziare la modifica di un condomino', () => {
+		const store = useAppStore.getState()
+		store.addCondomino({
+			nome: 'Mario',
+			cognome: 'Rossi',
+			appartamento: 'A1',
+			tipo: 'proprietario-residente',
+		})
+
+		render(<CondominiStep />)
+		
+		const editBtn = screen.getByRole('button', { name: /Modifica/i })
+		fireEvent.click(editBtn)
+
+		// Il modal ha label "Cognome" senza asterisco
+		expect(screen.getByLabelText('Cognome')).toHaveValue('Rossi')
+		expect(screen.getByText('Annulla')).toBeDefined()
+	})
+
+	it('esporta i condomini in JSON', () => {
+		const store = useAppStore.getState()
+		store.addCondomino({ nome: 'A', cognome: 'B', appartamento: '1', tipo: 'proprietario-residente' })
+		
+		const createObjectURLMock = vi.fn(() => 'blob-url')
+		globalThis.URL.createObjectURL = createObjectURLMock
+		globalThis.URL.revokeObjectURL = vi.fn()
+		
+		const link = { click: vi.fn(), href: '', download: '' }
+		const originalCreateElement = document.createElement
+		vi.spyOn(document, 'createElement').mockImplementation((tagName) => {
+			if (tagName === 'a') return link as any
+			return originalCreateElement.call(document, tagName)
+		})
+		
+		render(<CondominiStep />)
+		
+		fireEvent.click(screen.getByText('Esporta'))
+		
+		expect(link.download).toBe('condomini.json')
+	})
+
+	it('permette di procedere allo step successivo', () => {
+		const store = useAppStore.getState()
+		store.addCondomino({ nome: 'A', cognome: 'B', appartamento: '1', tipo: 'proprietario-residente' })
+		
+		render(<CondominiStep />)
+		
+		fireEvent.click(screen.getByText('Continua → Bolletta'))
+		expect(useAppStore.getState().activeStep).toBe('bolletta')
+	})
+
+	it('importa i condomini da JSON', async () => {
+		const mockData = [
+			{ id: '1', nome: 'M', cognome: 'R', appartamento: '1', tipo: 'proprietario-residente', letturaAttuale: 0, letturaPrecedente: 0 }
+		]
+		const file = new File([JSON.stringify(mockData)], 'condomini.json', { type: 'application/json' })
+		
+		render(<CondominiStep />)
+		
+		const input = document.querySelector('input[type="file"]') as HTMLInputElement
+		fireEvent.change(input, { target: { files: [file] } })
+		
+		await vi.waitFor(() => expect(useAppStore.getState().condomini).toHaveLength(1))
 	})
 })

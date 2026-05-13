@@ -85,24 +85,37 @@ export async function generatePDFBlobUrl(
 	}
 }
 
-function rigaToCSV(r: RigaRisultato): string {
-	const quotaServizi = r.quotaFogna + r.quotaDepurazione + r.quotaPerequazione
+function rigaAcquaToCSV(r: RigaRisultato): string {
+	const quotaServizi = (r.quotaFogna || 0) + (r.quotaDepurazione || 0) + (r.quotaPerequazione || 0)
 	const cols = [
 		`"${r.condomino.cognome} ${r.condomino.nome}"`,
 		`"${r.condomino.appartamento}"`,
 		r.consumoReale,
 		r.consumoTotale,
-		fmt(r.quotaFissa),
-		fmt(r.tariffaAgevolata),
-		fmt(r.eccedenzaBase),
-		fmt(r.eccedenzaFascia1),
-		fmt(r.eccedenzaFascia2),
-		fmt(r.eccedenzaFascia3),
+		fmt(r.quotaFissa || 0),
+		fmt(r.tariffaAgevolata || 0),
+		fmt(r.eccedenzaBase || 0),
+		fmt(r.eccedenzaFascia1 || 0),
+		fmt(r.eccedenzaFascia2 || 0),
+		fmt(r.eccedenzaFascia3 || 0),
 		fmt(quotaServizi),
-		fmt(r.totaleParziale),
-		fmt(r.iva),
-		fmt(r.rettificaAcconti),
-		fmt(r.totaleFatturaAQP),
+		// r.totaleParziale non è più presente come campo diretto in RigaRisultato per flessibilità, lo ricalcoliamo o lo ignoriamo se non serve
+		fmt((r.quotaFissa || 0) + (r.tariffaAgevolata || 0) + (r.eccedenzaBase || 0) + (r.eccedenzaFascia1 || 0) + (r.eccedenzaFascia2 || 0) + (r.eccedenzaFascia3 || 0) + quotaServizi),
+		fmt(r.iva || 0),
+		fmt(r.rettificaAcconti || 0),
+		fmt(r.totaleFatturaAQP || 0),
+		fmt(r.spesePostali),
+		fmt(r.speseGestione),
+		fmt(r.totaleDaPagare),
+	]
+	return cols.join(';')
+}
+
+function rigaLuceToCSV(r: RigaRisultato): string {
+	const cols = [
+		`"${r.condomino.cognome} ${r.condomino.nome}"`,
+		`"${r.condomino.appartamento}"`,
+		fmt(r.quotaBase || 0),
 		fmt(r.spesePostali),
 		fmt(r.speseGestione),
 		fmt(r.totaleDaPagare),
@@ -112,67 +125,100 @@ function rigaToCSV(r: RigaRisultato): string {
 
 export function exportToCSV(
 	risultato: RisultatoCalcolo,
-	bolletta: BollettaAcqua,
+	bolletta: BollettaAcqua | BollettaLuce,
+	isAcqua = true,
 ): void {
-	const headers = [
-		'Cognome Nome',
-		'Appartamento',
-		'Consumo Reale (mc)',
-		'Consumo Totale (mc)',
-		'Quota Fissa (€)',
-		'Tariffa Agevolata (€)',
-		'Eccedenza Base (€)',
-		'Eccedenza 1° Fascia (€)',
-		'Eccedenza 2° Fascia (€)',
-		'Eccedenza 3° Fascia (€)',
-		'Quota Servizi (Fogna/Dep/Per) (€)',
-		'Totale Parziale (€)',
-		'IVA (€)',
-		'Rettifica Acconti (€)',
-		'Totale Fattura AQP (€)',
-		'Spese Postali (€)',
-		'Spese Gestione (€)',
-		'Totale Da Pagare (€)',
-	].join(';')
+	let headers: string
+	let rows: string
+	let filename: string
 
-	const t = risultato.totali
-	const totaliServizi = t.quotaFogna + t.quotaDepurazione + t.quotaPerequazione
-	const totalsRow = [
-		'"TOTALE"',
-		'""',
-		t.consumoReale,
-		t.consumoTotale,
-		fmt(t.quotaFissa),
-		fmt(t.tariffaAgevolata),
-		fmt(t.eccedenzaBase),
-		fmt(t.eccedenzaFascia1),
-		fmt(t.eccedenzaFascia2),
-		fmt(t.eccedenzaFascia3),
-		fmt(totaliServizi),
-		fmt(t.totaleParziale),
-		fmt(t.iva),
-		fmt(t.rettificaAcconti),
-		fmt(t.totaleFatturaAQP),
-		fmt(t.spesePostali),
-		fmt(t.speseGestione),
-		fmt(t.totaleDaPagare),
-	].join(';')
+	if (isAcqua) {
+		const b = bolletta as BollettaAcqua
+		headers = [
+			'Cognome Nome',
+			'Appartamento',
+			'Consumo Reale (mc)',
+			'Consumo Totale (mc)',
+			'Quota Fissa (€)',
+			'Tariffa Agevolata (€)',
+			'Eccedenza Base (€)',
+			'Eccedenza 1° Fascia (€)',
+			'Eccedenza 2° Fascia (€)',
+			'Eccedenza 3° Fascia (€)',
+			'Quota Servizi (Fogna/Dep/Per) (€)',
+			'Totale Parziale (€)',
+			'IVA (€)',
+			'Rettifica Acconti (€)',
+			'Totale Fattura AQP (€)',
+			'Spese Postali (€)',
+			'Spese Gestione (€)',
+			'Totale Da Pagare (€)',
+		].join(';')
 
-	const discNote = `"Discrepanza: ${fmt(risultato.discrepanzaPercent, 1)}% (${risultato.discrepanzaMC > 0 ? '+' : ''}${risultato.discrepanzaMC} mc)"`
+		const t = risultato.totali
+		const totaliServizi = (t.quotaFogna || 0) + (t.quotaDepurazione || 0) + (t.quotaPerequazione || 0)
+		const totalsRow = [
+			'"TOTALE"',
+			'""',
+			t.consumoReale,
+			t.consumoTotale,
+			fmt(t.quotaFissa || 0),
+			fmt(t.tariffaAgevolata || 0),
+			fmt(t.eccedenzaBase || 0),
+			fmt(t.eccedenzaFascia1 || 0),
+			fmt(t.eccedenzaFascia2 || 0),
+			fmt(t.eccedenzaFascia3 || 0),
+			fmt(totaliServizi),
+			fmt((t.quotaFissa || 0) + (t.tariffaAgevolata || 0) + (t.eccedenzaBase || 0) + (t.eccedenzaFascia1 || 0) + (t.eccedenzaFascia2 || 0) + (t.eccedenzaFascia3 || 0) + totaliServizi),
+			fmt(t.iva || 0),
+			fmt(t.rettificaAcconti || 0),
+			fmt(t.totaleFatturaAQP || 0),
+			fmt(t.spesePostali),
+			fmt(t.speseGestione),
+			fmt(t.totaleDaPagare),
+		].join(';')
 
-	const rows = [
-		headers,
-		...risultato.righe.map(rigaToCSV),
-		totalsRow,
-		'',
-		discNote,
-	].join('\n')
+		const discNote = `"Discrepanza: ${fmt(risultato.discrepanzaPercent, 1)}% (${risultato.discrepanzaMC > 0 ? '+' : ''}${risultato.discrepanzaMC} mc)"`
+
+		rows = [
+			headers,
+			...risultato.righe.map(rigaAcquaToCSV),
+			totalsRow,
+			'',
+			discNote,
+		].join('\n')
+		filename = `ripartizione-acqua-${b.dataScadenza || 'export'}.csv`
+	} else {
+		const b = bolletta as BollettaLuce
+		headers = [
+			'Cognome Nome',
+			'Appartamento',
+			'Quota Base (€)',
+			'Spese Postali / Commissioni (€)',
+			'Spese Gestione / Cancelleria (€)',
+			'Totale Da Pagare (€)',
+		].join(';')
+
+		const t = risultato.totali
+		const totalsRow = [
+			'"TOTALE"',
+			'""',
+			fmt(t.quotaBase || 0),
+			fmt(t.spesePostali),
+			fmt(t.speseGestione),
+			fmt(t.totaleDaPagare),
+		].join(';')
+
+		rows = [headers, ...risultato.righe.map(rigaLuceToCSV), totalsRow].join('\n')
+		filename = `ripartizione-luce-${b.dataScadenza || 'export'}.csv`
+	}
+
 	const bom = '﻿'
 	const blob = new Blob([bom + rows], { type: 'text/csv;charset=utf-8;' })
 	const url = URL.createObjectURL(blob)
 	const a = document.createElement('a')
 	a.href = url
-	a.download = `ripartizione-acqua-${bolletta.dataScadenza || 'export'}.csv`
+	a.download = filename
 	a.click()
 	URL.revokeObjectURL(url)
 }
