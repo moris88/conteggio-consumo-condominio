@@ -1,7 +1,13 @@
 import { RotateCameraRight as RotateRight } from 'iconoir-react'
 import { useMemo } from 'react'
 
-import { BollettaLuceStep, BollettaStep, CondominiStep, ConsumiStep, RisultatiStep } from '@/components'
+import {
+	BollettaLuceStep,
+	BollettaStep,
+	CondominiStep,
+	ConsumiStep,
+	RisultatiStep,
+} from '@/components'
 import { Stepper } from '@/components/ui/Stepper'
 import { useAppStore } from '@/store/useAppStore'
 import type { AppStep } from '@/types'
@@ -25,17 +31,18 @@ export function App() {
 	const completedSteps = useMemo<AppStep[]>(() => {
 		const steps: AppStep[] = []
 		if (condomini.length > 0) steps.push('condomini')
-		
+
 		if (isAcqua) {
 			if (bolletta.consumoTotale > 0) steps.push('bolletta')
 			const hasConsumi = condomini.some(
-				(c) => c.tipo !== 'proprietario-non-residente' && getConsumoReale(c) > 0,
+				(c) =>
+					c.tipo !== 'proprietario-non-residente' && getConsumoReale(c) > 0,
 			)
 			if (hasConsumi && bolletta.consumoTotale > 0) steps.push('consumi')
 		} else {
 			if (bollettaLuce.totaleBolletta > 0) steps.push('bolletta')
 		}
-		
+
 		return steps
 	}, [condomini, bolletta, bollettaLuce, isAcqua])
 
@@ -99,16 +106,21 @@ export function App() {
 						activeStep={activeStep}
 						completedSteps={completedSteps}
 						onStepChange={setActiveStep}
-						steps={isAcqua ? undefined : [
-							{ id: 'condomini', label: 'Condomini', shortLabel: '1' },
-							{ id: 'bolletta', label: 'Bolletta', shortLabel: '2' },
-							{ id: 'risultati', label: 'Risultati', shortLabel: '3' },
-						]}
+						steps={
+							isAcqua
+								? undefined
+								: [
+										{ id: 'condomini', label: 'Condomini', shortLabel: '1' },
+										{ id: 'bolletta', label: 'Bolletta', shortLabel: '2' },
+										{ id: 'risultati', label: 'Risultati', shortLabel: '3' },
+									]
+						}
 					/>
 				</div>
 
 				{activeStep === 'condomini' && <CondominiStep />}
-				{activeStep === 'bolletta' && (isAcqua ? <BollettaStep /> : <BollettaLuceStep />)}
+				{activeStep === 'bolletta' &&
+					(isAcqua ? <BollettaStep /> : <BollettaLuceStep />)}
 				{activeStep === 'consumi' && isAcqua && <ConsumiStep />}
 				{activeStep === 'risultati' && <RisultatiStep />}
 			</main>

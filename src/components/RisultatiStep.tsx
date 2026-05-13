@@ -3,7 +3,12 @@ import { useMemo, useRef, useState } from 'react'
 
 import { useAppStore } from '@/store/useAppStore'
 import type { RigaRisultato } from '@/types'
-import { calcolaRisultati, calcolaRisultatiLuce, fmt, fmtEur } from '@/utils/calcoli'
+import {
+	calcolaRisultati,
+	calcolaRisultatiLuce,
+	fmt,
+	fmtEur,
+} from '@/utils/calcoli'
 import { exportToCSV, exportToPDF, generatePDFBlobUrl } from '@/utils/esporta'
 import {
 	Alert,
@@ -54,7 +59,9 @@ function RigaTabellaAcqua({ riga }: { riga: RigaRisultato }) {
 		(riga.eccedenzaFascia2 || 0) +
 		(riga.eccedenzaFascia3 || 0)
 	const quotaServizi =
-		(riga.quotaFogna || 0) + (riga.quotaDepurazione || 0) + (riga.quotaPerequazione || 0)
+		(riga.quotaFogna || 0) +
+		(riga.quotaDepurazione || 0) +
+		(riga.quotaPerequazione || 0)
 	return (
 		<tr className="hover:bg-slate-50">
 			<td className="whitespace-nowrap border border-slate-300 px-2 py-1.5 font-medium text-slate-900 text-xs">
@@ -84,7 +91,17 @@ function RigaTabellaAcqua({ riga }: { riga: RigaRisultato }) {
 			<TCell>{fmtEur(riga.eccedenzaFascia3 || 0)}</TCell>
 			<TCell>{fmtEur(quotaServizioAquedotto)}</TCell>
 			<TCell>{fmtEur(quotaServizi)}</TCell>
-			<TCell bold>{fmtEur((riga.quotaFissa || 0) + (riga.tariffaAgevolata || 0) + (riga.eccedenzaBase || 0) + (riga.eccedenzaFascia1 || 0) + (riga.eccedenzaFascia2 || 0) + (riga.eccedenzaFascia3 || 0) + quotaServizi)}</TCell>
+			<TCell bold>
+				{fmtEur(
+					(riga.quotaFissa || 0) +
+						(riga.tariffaAgevolata || 0) +
+						(riga.eccedenzaBase || 0) +
+						(riga.eccedenzaFascia1 || 0) +
+						(riga.eccedenzaFascia2 || 0) +
+						(riga.eccedenzaFascia3 || 0) +
+						quotaServizi,
+				)}
+			</TCell>
 			<TCell>{fmtEur(riga.iva || 0)}</TCell>
 			<TCell>
 				{riga.rettificaAcconti !== 0 ? fmtEur(riga.rettificaAcconti || 0) : '—'}
@@ -109,16 +126,21 @@ function RigaTabellaLuce({ riga }: { riga: RigaRisultato }) {
 					{riga.condomino.appartamento}
 				</span>
 			</td>
-			<TCell bold highlight>{fmtEur(riga.quotaBase || 0)}</TCell>
+			<TCell bold highlight>
+				{fmtEur(riga.quotaBase || 0)}
+			</TCell>
 			<TCell>{fmtEur(riga.spesePostali)}</TCell>
 			<TCell>{riga.speseGestione > 0 ? fmtEur(riga.speseGestione) : '—'}</TCell>
-			<TCell bold highlight>{fmtEur(riga.totaleDaPagare)}</TCell>
+			<TCell bold highlight>
+				{fmtEur(riga.totaleDaPagare)}
+			</TCell>
 		</tr>
 	)
 }
 
 export function RisultatiStep() {
-	const { condomini, bolletta, bollettaLuce, type, setActiveStep } = useAppStore()
+	const { condomini, bolletta, bollettaLuce, type, setActiveStep } =
+		useAppStore()
 	const tableRef = useRef<HTMLDivElement>(null)
 	const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 	const [loadingPdf, setLoadingPdf] = useState(false)
@@ -172,10 +194,10 @@ export function RisultatiStep() {
 				<>
 					{risultato.discrepanzaElevata && (
 						<Alert variant="error" title="Discrepanza elevata">
-							La discrepanza tra consumo reale ({risultato.consumoRealeTotale} mc) e
-							consumo dichiarato in bolletta ({risultato.consumoBolletta} mc) è del{' '}
-							<strong>{fmt(risultato.discrepanzaPercent, 1)}%</strong> (
-							{risultato.discrepanzaMC > 0 ? '+' : ''}
+							La discrepanza tra consumo reale ({risultato.consumoRealeTotale}{' '}
+							mc) e consumo dichiarato in bolletta ({risultato.consumoBolletta}{' '}
+							mc) è del <strong>{fmt(risultato.discrepanzaPercent, 1)}%</strong>{' '}
+							({risultato.discrepanzaMC > 0 ? '+' : ''}
 							{risultato.discrepanzaMC} mc), superiore al{' '}
 							{bolletta.sogliaDiscrepanza}
 							%.
@@ -184,8 +206,9 @@ export function RisultatiStep() {
 
 					{!risultato.discrepanzaElevata && risultato.discrepanzaMC !== 0 && (
 						<Alert variant="info">
-							Discrepanza: <strong>{fmt(risultato.discrepanzaPercent, 1)}%</strong>{' '}
-							({risultato.discrepanzaMC > 0 ? '+' : ''}
+							Discrepanza:{' '}
+							<strong>{fmt(risultato.discrepanzaPercent, 1)}%</strong> (
+							{risultato.discrepanzaMC > 0 ? '+' : ''}
 							{risultato.discrepanzaMC} mc tra consumo bolletta e letture
 							individuali).
 						</Alert>
@@ -193,7 +216,9 @@ export function RisultatiStep() {
 				</>
 			)}
 
-			<div className={`grid gap-3 ${isAcqua ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2'}`}>
+			<div
+				className={`grid gap-3 ${isAcqua ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2'}`}
+			>
 				{isAcqua && (
 					<>
 						<Card className="p-4">
@@ -295,9 +320,9 @@ export function RisultatiStep() {
 									</span>
 									<span className="font-bold text-slate-900 text-xs">
 										{currentBolletta.dataDocumento
-											? new Date(currentBolletta.dataDocumento).toLocaleDateString(
-													'it-IT',
-												)
+											? new Date(
+													currentBolletta.dataDocumento,
+												).toLocaleDateString('it-IT')
 											: '—'}
 									</span>
 								</div>
@@ -306,8 +331,13 @@ export function RisultatiStep() {
 										Periodo
 									</span>
 									<span className="font-bold text-slate-900 text-xs">
-										{new Date(currentBolletta.dataInizio).toLocaleDateString('it-IT')}{' '}
-										— {new Date(currentBolletta.dataFine).toLocaleDateString('it-IT')}
+										{new Date(currentBolletta.dataInizio).toLocaleDateString(
+											'it-IT',
+										)}{' '}
+										—{' '}
+										{new Date(currentBolletta.dataFine).toLocaleDateString(
+											'it-IT',
+										)}
 									</span>
 								</div>
 								<div className="flex justify-between gap-4 py-0.5">
@@ -316,9 +346,9 @@ export function RisultatiStep() {
 									</span>
 									<span className="font-black text-red-600 text-sm">
 										{currentBolletta.dataScadenza
-											? new Date(currentBolletta.dataScadenza).toLocaleDateString(
-													'it-IT',
-												)
+											? new Date(
+													currentBolletta.dataScadenza,
+												).toLocaleDateString('it-IT')
 											: '—'}
 									</span>
 								</div>
@@ -375,13 +405,40 @@ export function RisultatiStep() {
 										<TCell bold>{fmtEur(t.eccedenzaFascia1 || 0)}</TCell>
 										<TCell bold>{fmtEur(t.eccedenzaFascia2 || 0)}</TCell>
 										<TCell bold>{fmtEur(t.eccedenzaFascia3 || 0)}</TCell>
-										<TCell bold>{fmtEur((t.tariffaAgevolata || 0) + (t.eccedenzaBase || 0) + (t.eccedenzaFascia1 || 0) + (t.eccedenzaFascia2 || 0) + (t.eccedenzaFascia3 || 0))}</TCell>
 										<TCell bold>
-											<Tooltip content={`${fmtEur(t.quotaFogna || 0)} / ${fmtEur(t.quotaDepurazione || 0)} / ${fmtEur(t.quotaPerequazione || 0)}`} placement="top">
-												{fmtEur((t.quotaFogna || 0) + (t.quotaDepurazione || 0) + (t.quotaPerequazione || 0))}
+											{fmtEur(
+												(t.tariffaAgevolata || 0) +
+													(t.eccedenzaBase || 0) +
+													(t.eccedenzaFascia1 || 0) +
+													(t.eccedenzaFascia2 || 0) +
+													(t.eccedenzaFascia3 || 0),
+											)}
+										</TCell>
+										<TCell bold>
+											<Tooltip
+												content={`${fmtEur(t.quotaFogna || 0)} / ${fmtEur(t.quotaDepurazione || 0)} / ${fmtEur(t.quotaPerequazione || 0)}`}
+												placement="top"
+											>
+												{fmtEur(
+													(t.quotaFogna || 0) +
+														(t.quotaDepurazione || 0) +
+														(t.quotaPerequazione || 0),
+												)}
 											</Tooltip>
 										</TCell>
-										<TCell bold>{fmtEur((t.quotaFissa || 0) + (t.tariffaAgevolata || 0) + (t.eccedenzaBase || 0) + (t.eccedenzaFascia1 || 0) + (t.eccedenzaFascia2 || 0) + (t.eccedenzaFascia3 || 0) + (t.quotaFogna || 0) + (t.quotaDepurazione || 0) + (t.quotaPerequazione || 0))}</TCell>
+										<TCell bold>
+											{fmtEur(
+												(t.quotaFissa || 0) +
+													(t.tariffaAgevolata || 0) +
+													(t.eccedenzaBase || 0) +
+													(t.eccedenzaFascia1 || 0) +
+													(t.eccedenzaFascia2 || 0) +
+													(t.eccedenzaFascia3 || 0) +
+													(t.quotaFogna || 0) +
+													(t.quotaDepurazione || 0) +
+													(t.quotaPerequazione || 0),
+											)}
+										</TCell>
 										<TCell bold>{fmtEur(t.iva || 0)}</TCell>
 										<TCell bold>
 											{t.rettificaAcconti !== 0
@@ -423,10 +480,14 @@ export function RisultatiStep() {
 										<td className="border border-slate-300 px-2 py-2 font-bold text-slate-900 text-xs">
 											TOTALE
 										</td>
-										<TCell bold highlight>{fmtEur(t.quotaBase || 0)}</TCell>
+										<TCell bold highlight>
+											{fmtEur(t.quotaBase || 0)}
+										</TCell>
 										<TCell bold>{fmtEur(t.spesePostali)}</TCell>
 										<TCell bold>{fmtEur(t.speseGestione)}</TCell>
-										<TCell bold highlight>{fmtEur(t.totaleDaPagare)}</TCell>
+										<TCell bold highlight>
+											{fmtEur(t.totaleDaPagare)}
+										</TCell>
 									</tr>
 								</tfoot>
 							</table>

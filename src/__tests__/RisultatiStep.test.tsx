@@ -85,14 +85,19 @@ describe('RisultatiStep', () => {
 	})
 
 	it('apre anteprima PDF', async () => {
-		act(() => {
+		await act(async () => {
 			useAppStore.getState().addCondomino({
 				nome: 'Mario',
 				cognome: 'Rossi',
 				appartamento: 'A1',
 				tipo: 'proprietario-residente',
 			})
-			useAppStore.getState().updateCondomino(useAppStore.getState().condomini[0].id, { letturaPrecedente: 10, letturaAttuale: 20 })
+			useAppStore
+				.getState()
+				.updateCondomino(useAppStore.getState().condomini[0].id, {
+					letturaPrecedente: 10,
+					letturaAttuale: 20,
+				})
 			useAppStore.getState().setBolletta({
 				...useAppStore.getState().bolletta,
 				consumoTotale: 10,
@@ -100,16 +105,18 @@ describe('RisultatiStep', () => {
 		})
 
 		render(<RisultatiStep />)
-		
-		const previewBtn = screen.getByText('Anteprima PDF')
-		fireEvent.click(previewBtn)
 
-		// Dovrebbe mostrare un caricamento
-		expect(screen.getByText('Caricamento...')).toBeDefined()
+		const previewBtn = screen.getByRole('button', { name: /Anteprima PDF/i })
+		await act(async () => {
+			fireEvent.click(previewBtn)
+		})
+
+		// Dovrebbe mostrare un caricamento o il modal
+		expect(screen.getByRole('heading', { name: /Anteprima PDF/i })).toBeDefined()
 	})
 
 	it('esporta in CSV', async () => {
-		act(() => {
+		await act(async () => {
 			useAppStore.getState().addCondomino({
 				nome: 'Mario',
 				cognome: 'Rossi',
@@ -123,10 +130,37 @@ describe('RisultatiStep', () => {
 		})
 
 		render(<RisultatiStep />)
-		
-		const csvBtn = screen.getByText('CSV')
-		fireEvent.click(csvBtn)
+
+		const csvBtn = screen.getByRole('button', { name: /CSV/i })
+		await act(async () => {
+			fireEvent.click(csvBtn)
+		})
 
 		expect(globalThis.URL.createObjectURL).toHaveBeenCalled()
+	})
+
+	it('visualizza i risultati per la bolletta luce', async () => {
+		await act(async () => {
+			useAppStore.getState().setType('luce')
+			useAppStore.getState().addCondomino({
+				nome: 'Luigi',
+				cognome: 'Verdi',
+				appartamento: 'B2',
+				tipo: 'proprietario-residente',
+			})
+			useAppStore.getState().setBollettaLuce({
+				...useAppStore.getState().bollettaLuce,
+				totaleBolletta: 100,
+				spesePostali: 10,
+				speseGestione: 5,
+			})
+		})
+
+		render(<RisultatiStep />)
+
+		expect(screen.getByText('Ripartizione Bolletta Luce')).toBeDefined()
+		expect(screen.getByText(/Luigi/i)).toBeDefined()
+		expect(screen.getByText(/Verdi/i)).toBeDefined()
+		expect(screen.getAllByText('100,00 €').length).toBeGreaterThan(0) // Quota base
 	})
 })

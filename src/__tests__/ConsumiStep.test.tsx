@@ -39,12 +39,17 @@ describe('ConsumiStep', () => {
 	it('permette di tornare allo step precedente', () => {
 		act(() => {
 			const store = useAppStore.getState()
-			store.addCondomino({ nome: 'A', cognome: 'B', appartamento: '1', tipo: 'proprietario-residente' })
+			store.addCondomino({
+				nome: 'A',
+				cognome: 'B',
+				appartamento: '1',
+				tipo: 'proprietario-residente',
+			})
 			store.setBolletta({ ...store.bolletta, consumoTotale: 100 })
 		})
-		
+
 		render(<ConsumiStep />)
-		
+
 		fireEvent.click(screen.getByText('← Bolletta'))
 		expect(useAppStore.getState().activeStep).toBe('bolletta')
 	})
@@ -52,13 +57,18 @@ describe('ConsumiStep', () => {
 	it('permette di procedere allo step successivo', () => {
 		act(() => {
 			const store = useAppStore.getState()
-			store.addCondomino({ nome: 'A', cognome: 'B', appartamento: '1', tipo: 'proprietario-residente' })
+			store.addCondomino({
+				nome: 'A',
+				cognome: 'B',
+				appartamento: '1',
+				tipo: 'proprietario-residente',
+			})
 			store.setBolletta({ ...store.bolletta, consumoTotale: 100 })
 			store.setActiveStep('consumi')
 		})
-		
+
 		render(<ConsumiStep />)
-		
+
 		fireEvent.click(screen.getByText('Calcola Risultati →'))
 		expect(useAppStore.getState().activeStep).toBe('risultati')
 	})
@@ -66,19 +76,24 @@ describe('ConsumiStep', () => {
 	it('aggiorna le soglie e quote minime', () => {
 		act(() => {
 			const store = useAppStore.getState()
-			store.addCondomino({ nome: 'A', cognome: 'B', appartamento: '1', tipo: 'proprietario-residente' })
+			store.addCondomino({
+				nome: 'A',
+				cognome: 'B',
+				appartamento: '1',
+				tipo: 'proprietario-residente',
+			})
 		})
-		
+
 		render(<ConsumiStep />)
-		
+
 		const select = screen.getByLabelText(/Soglia discrepanza/i)
 		fireEvent.change(select, { target: { value: '20' } })
-		
+
 		expect(useAppStore.getState().bolletta.sogliaDiscrepanza).toBe(20)
-		
+
 		const quotaMin = screen.getByLabelText(/Quota minima tariffa agevolata/i)
 		fireEvent.change(quotaMin, { target: { value: '15' } })
-		
+
 		expect(useAppStore.getState().bolletta.tariffaAgevolataMin).toBe(15)
 	})
 })

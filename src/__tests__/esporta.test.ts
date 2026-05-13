@@ -28,7 +28,12 @@ const { mockSave, mockAddImage, mockOutput, MockJsPDF } = vi.hoisted(() => {
 		output = output
 	}
 
-	return { mockSave: save, mockAddImage: addImage, mockOutput: output, MockJsPDF }
+	return {
+		mockSave: save,
+		mockAddImage: addImage,
+		mockOutput: output,
+		MockJsPDF,
+	}
 })
 
 vi.mock('jspdf', () => ({
@@ -210,4 +215,3 @@ describe('esporta utility', () => {
 		expect(url).toBeNull()
 	})
 })
-

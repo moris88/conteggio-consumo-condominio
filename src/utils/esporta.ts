@@ -86,7 +86,8 @@ export async function generatePDFBlobUrl(
 }
 
 function rigaAcquaToCSV(r: RigaRisultato): string {
-	const quotaServizi = (r.quotaFogna || 0) + (r.quotaDepurazione || 0) + (r.quotaPerequazione || 0)
+	const quotaServizi =
+		(r.quotaFogna || 0) + (r.quotaDepurazione || 0) + (r.quotaPerequazione || 0)
 	const cols = [
 		`"${r.condomino.cognome} ${r.condomino.nome}"`,
 		`"${r.condomino.appartamento}"`,
@@ -100,7 +101,15 @@ function rigaAcquaToCSV(r: RigaRisultato): string {
 		fmt(r.eccedenzaFascia3 || 0),
 		fmt(quotaServizi),
 		// r.totaleParziale non è più presente come campo diretto in RigaRisultato per flessibilità, lo ricalcoliamo o lo ignoriamo se non serve
-		fmt((r.quotaFissa || 0) + (r.tariffaAgevolata || 0) + (r.eccedenzaBase || 0) + (r.eccedenzaFascia1 || 0) + (r.eccedenzaFascia2 || 0) + (r.eccedenzaFascia3 || 0) + quotaServizi),
+		fmt(
+			(r.quotaFissa || 0) +
+				(r.tariffaAgevolata || 0) +
+				(r.eccedenzaBase || 0) +
+				(r.eccedenzaFascia1 || 0) +
+				(r.eccedenzaFascia2 || 0) +
+				(r.eccedenzaFascia3 || 0) +
+				quotaServizi,
+		),
 		fmt(r.iva || 0),
 		fmt(r.rettificaAcconti || 0),
 		fmt(r.totaleFatturaAQP || 0),
@@ -156,7 +165,10 @@ export function exportToCSV(
 		].join(';')
 
 		const t = risultato.totali
-		const totaliServizi = (t.quotaFogna || 0) + (t.quotaDepurazione || 0) + (t.quotaPerequazione || 0)
+		const totaliServizi =
+			(t.quotaFogna || 0) +
+			(t.quotaDepurazione || 0) +
+			(t.quotaPerequazione || 0)
 		const totalsRow = [
 			'"TOTALE"',
 			'""',
@@ -169,7 +181,15 @@ export function exportToCSV(
 			fmt(t.eccedenzaFascia2 || 0),
 			fmt(t.eccedenzaFascia3 || 0),
 			fmt(totaliServizi),
-			fmt((t.quotaFissa || 0) + (t.tariffaAgevolata || 0) + (t.eccedenzaBase || 0) + (t.eccedenzaFascia1 || 0) + (t.eccedenzaFascia2 || 0) + (t.eccedenzaFascia3 || 0) + totaliServizi),
+			fmt(
+				(t.quotaFissa || 0) +
+					(t.tariffaAgevolata || 0) +
+					(t.eccedenzaBase || 0) +
+					(t.eccedenzaFascia1 || 0) +
+					(t.eccedenzaFascia2 || 0) +
+					(t.eccedenzaFascia3 || 0) +
+					totaliServizi,
+			),
 			fmt(t.iva || 0),
 			fmt(t.rettificaAcconti || 0),
 			fmt(t.totaleFatturaAQP || 0),
@@ -209,7 +229,9 @@ export function exportToCSV(
 			fmt(t.totaleDaPagare),
 		].join(';')
 
-		rows = [headers, ...risultato.righe.map(rigaLuceToCSV), totalsRow].join('\n')
+		rows = [headers, ...risultato.righe.map(rigaLuceToCSV), totalsRow].join(
+			'\n',
+		)
 		filename = `ripartizione-luce-${b.dataScadenza || 'export'}.csv`
 	}
 

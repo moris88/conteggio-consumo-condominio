@@ -28,7 +28,11 @@ describe('BollettaStep', () => {
 		render(<BollettaStep />)
 
 		const fields = [
-			{ label: /Consumo totale dichiarato/i, key: 'consumoTotale', value: '150' },
+			{
+				label: /Consumo totale dichiarato/i,
+				key: 'consumoTotale',
+				value: '150',
+			},
 			{ label: /Quota fissa/i, key: 'quotaFissa', value: '25.5' },
 			{ label: /Tariffa agevolata/i, key: 'tariffaAgevolata', value: '40' },
 			{ label: /1° Fascia/i, key: 'eccedenzaFascia1', value: '10' },
@@ -58,9 +62,9 @@ describe('BollettaStep', () => {
 		render(<BollettaStep />)
 		const consumoInput = screen.getByLabelText(/Consumo totale dichiarato/i)
 		fireEvent.change(consumoInput, { target: { value: '100' } })
-		
+
 		fireEvent.click(screen.getByText('Azzera dati bolletta'))
-		
+
 		expect(consumoInput).toHaveValue(null) // NumberInput renders 0 as empty string
 	})
 
@@ -75,7 +79,7 @@ describe('BollettaStep', () => {
 		const consumoInput = screen.getByLabelText(/Consumo totale dichiarato/i)
 		fireEvent.change(consumoInput, { target: { value: '100' } })
 		fireEvent.click(screen.getByText('Salva bolletta'))
-		
+
 		fireEvent.click(screen.getByText('Continua → Consumi'))
 		expect(useAppStore.getState().activeStep).toBe('consumi')
 	})
