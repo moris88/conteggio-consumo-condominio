@@ -112,7 +112,9 @@ describe('RisultatiStep', () => {
 		})
 
 		// Dovrebbe mostrare un caricamento o il modal
-		expect(screen.getByRole('heading', { name: /Anteprima PDF/i })).toBeDefined()
+		expect(
+			screen.getByRole('heading', { name: /Anteprima PDF/i }),
+		).toBeDefined()
 	})
 
 	it('esporta in CSV', async () => {
