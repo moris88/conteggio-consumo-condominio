@@ -1,7 +1,12 @@
 import jsPDF from 'jspdf'
 import { domToCanvas } from 'modern-screenshot'
 
-import type { BollettaAcqua, RigaRisultato, RisultatoCalcolo } from '@/types'
+import type {
+	BollettaAcqua,
+	BollettaLuce,
+	RigaRisultato,
+	RisultatoCalcolo,
+} from '@/types'
 import { fmt, fmtEur } from './calcoli'
 
 export async function exportToPDF(

@@ -106,15 +106,6 @@ export function App() {
 						activeStep={activeStep}
 						completedSteps={completedSteps}
 						onStepChange={setActiveStep}
-						steps={
-							isAcqua
-								? undefined
-								: [
-										{ id: 'condomini', label: 'Condomini', shortLabel: '1' },
-										{ id: 'bolletta', label: 'Bolletta', shortLabel: '2' },
-										{ id: 'risultati', label: 'Risultati', shortLabel: '3' },
-									]
-						}
 					/>
 				</div>
 

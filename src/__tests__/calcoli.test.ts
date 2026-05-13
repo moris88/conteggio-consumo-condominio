@@ -102,9 +102,11 @@ describe('Logica di Ripartizione Eccedenze (Selettiva)', () => {
 		const rigaN = risultato.righe[1]
 
 		// Ripartizione proporzionale: 15 / (15+23) e 23 / (15+23)
-		const totale = rigaB.tariffaAgevolata + rigaN.tariffaAgevolata
+		const totale = (rigaB.tariffaAgevolata ?? 0) + (rigaN.tariffaAgevolata ?? 0)
 		expect(totale).toBeCloseTo(BOLLETTA_PDF.tariffaAgevolata, 2)
-		expect(rigaB.tariffaAgevolata).toBeLessThan(rigaN.tariffaAgevolata)
+		expect(rigaB.tariffaAgevolata ?? 0).toBeLessThan(
+			rigaN.tariffaAgevolata ?? 0,
+		)
 	})
 
 	it('Fallback: se nessuno è sopra soglia, ripartisce proporzionalmente', () => {

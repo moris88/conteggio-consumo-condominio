@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import type { AppStep, BollettaAcqua, Condomino } from '@/types'
+import type { AppStep, BollettaAcqua, BollettaLuce, Condomino } from '@/types'
 
 const oggi = new Date().toISOString().split('T')[0]
 const treMesiFa = new Date()
