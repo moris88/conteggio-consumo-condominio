@@ -212,4 +212,50 @@ describe('esporta utility', () => {
 		const url = await generatePDFBlobUrl(mockRef as any)
 		expect(url).toBeNull()
 	})
+
+	it('exportToCSV genera un file per bolletta luce', () => {
+		const createObjectURLMock = vi.fn(() => 'blob-url')
+		globalThis.URL.createObjectURL = createObjectURLMock
+		globalThis.URL.revokeObjectURL = vi.fn()
+
+		const link = {
+			click: vi.fn(),
+			setAttribute: vi.fn(),
+			href: '',
+			download: '',
+		}
+		vi.spyOn(document, 'createElement').mockReturnValue(link as any)
+
+		const mockRisultato: any = {
+			righe: [
+				{
+					condomino: {
+						id: '1',
+						nome: 'L.',
+						cognome: 'Verdi',
+						appartamento: 'B2',
+					},
+					quotaBase: 10,
+					spesePostali: 1,
+					speseGestione: 0,
+					totaleDaPagare: 11,
+				},
+			],
+			totali: {
+				quotaBase: 10,
+				spesePostali: 1,
+				speseGestione: 0,
+				totaleDaPagare: 11,
+			},
+		}
+
+		const mockBollettaLuce: any = {
+			dataScadenza: '2025-04-15',
+			totaleBolletta: 10,
+		}
+
+		exportToCSV(mockRisultato, mockBollettaLuce, false)
+
+		expect(link.download).toBe('ripartizione-luce-2025-04-15.csv')
+	})
 })

@@ -31,8 +31,8 @@ describe('ConsumiStep', () => {
 		fireEvent.change(precInput, { target: { value: '50' } })
 		fireEvent.change(attInput, { target: { value: '60' } })
 
-		expect(useAppStore.getState().condomini[0].letturaPrecedente).toBe(50)
-		expect(useAppStore.getState().condomini[0].letturaAttuale).toBe(60)
+		expect(useAppStore.getState().condominiAcqua[0].letturaPrecedente).toBe(50)
+		expect(useAppStore.getState().condominiAcqua[0].letturaAttuale).toBe(60)
 		expect(screen.getByText('10 mc')).toBeDefined()
 	})
 
