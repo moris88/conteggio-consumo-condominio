@@ -132,7 +132,6 @@ export const APP_STEPS: { id: AppStep; label: string; shortLabel: string }[] = [
 	{ id: 'bolletta', label: 'Bolletta', shortLabel: '2' },
 	{ id: 'consumi', label: 'Consumi', shortLabel: '3' },
 	{ id: 'risultati', label: 'Risultati', shortLabel: '4' },
-	{ id: 'storico', label: 'Storico', shortLabel: '5' },
 ]
 
 export interface StoricoBolletta {
