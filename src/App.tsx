@@ -1,4 +1,4 @@
-import { Check, RotateCameraRight as RotateRight, Home } from 'iconoir-react'
+import { Check, Home, RotateCameraRight as RotateRight } from 'iconoir-react'
 import { useMemo } from 'react'
 import {
 	BollettaLuceStep,
@@ -60,17 +60,15 @@ export function App() {
 						</p>
 					</div>
 					<div className="flex items-center gap-3">
-						<Tooltip
-							content="Visualizza la home page"
-							placement="left"
-						>
+						<Tooltip content="Visualizza la home page" placement="left">
 							<button
 								type="button"
 								onClick={() => setActiveStep('condomini')}
-								className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors ${activeStep === 'condomini'
-									? 'bg-blue-50 text-blue-600'
-									: 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
-									}`}
+								className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors ${
+									activeStep === 'condomini'
+										? 'bg-blue-50 text-blue-600'
+										: 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+								}`}
 							>
 								<Home className="h-3.5 w-3.5" />
 								Home
@@ -83,10 +81,11 @@ export function App() {
 							<button
 								type="button"
 								onClick={() => setActiveStep('storico')}
-								className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors ${activeStep === 'storico'
+								className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors ${
+									activeStep === 'storico'
 										? 'bg-blue-50 text-blue-600'
 										: 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
-									}`}
+								}`}
 							>
 								<Check className="h-3.5 w-3.5" />
 								Storico
@@ -122,17 +121,18 @@ export function App() {
 							key={t.id}
 							type="button"
 							onClick={() => setType(t.id as 'acqua' | 'luce')}
-							className={`mr-2 mb-4 rounded-lg px-3 py-1.5 text-sm transition-colors ${type === t.id
+							className={`mr-2 mb-4 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+								type === t.id
 									? 'bg-blue-600 text-white'
 									: 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-								}`}
+							}`}
 						>
 							{t.label}
 						</button>
 					))}
 
-				{activeStep !== 'storico' &&
-					(<div className="mb-6 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+				{activeStep !== 'storico' && (
+					<div className="mb-6 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
 						<Stepper
 							activeStep={activeStep}
 							completedSteps={completedSteps}
