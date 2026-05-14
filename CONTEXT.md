@@ -72,3 +72,5 @@ src/
 - **Persistenza**: I dati non vanno persi al refresh della pagina.
 - **Export multiformato**: Genera PDF con anteprima o file CSV per Excel.
 - **Reset**: Pulsante per azzerare tutti i dati e ricominciare.
+
+---

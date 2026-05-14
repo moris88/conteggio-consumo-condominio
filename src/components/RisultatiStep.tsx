@@ -1,6 +1,6 @@
-import { Download, Printer } from 'iconoir-react'
+import { Check, Download, Printer } from 'iconoir-react'
 import { useMemo, useRef, useState } from 'react'
-
+import { twMerge } from 'tailwind-merge'
 import { useAppStore } from '@/store/useAppStore'
 import type { RigaRisultato } from '@/types'
 import {
@@ -143,7 +143,8 @@ export function RisultatiStep() {
 	const condomini = useAppStore((s) =>
 		type === 'acqua' ? s.condominiAcqua : s.condominiLuce,
 	)
-	const { bolletta, bollettaLuce, setActiveStep } = useAppStore()
+	const { bolletta, bollettaLuce, setActiveStep, salvaInStorico } =
+		useAppStore()
 	const tableRef = useRef<HTMLDivElement>(null)
 	const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 	const [loadingPdf, setLoadingPdf] = useState(false)
@@ -189,6 +190,15 @@ export function RisultatiStep() {
 
 	const handleDownloadCSV = () => {
 		exportToCSV(risultato, currentBolletta, isAcqua)
+	}
+
+	const handleSalvaInStorico = () => {
+		const nota = prompt('Vuoi aggiungere una nota a questa bolletta?')
+		if (nota !== null) {
+			salvaInStorico(nota)
+			alert('Bolletta salvata nello storico con successo!')
+			setActiveStep('storico')
+		}
 	}
 
 	return (
@@ -246,7 +256,7 @@ export function RisultatiStep() {
 						</Card>
 					</>
 				)}
-				<Card className="p-4">
+				<Card className={twMerge('p-4', !isAcqua && 'sm:col-span-2')}>
 					<p className="text-slate-500 text-xs">Totale da pagare</p>
 					<p className="font-bold text-green-700 text-xl">
 						{fmtEur(t.totaleDaPagare)}
@@ -277,6 +287,15 @@ export function RisultatiStep() {
 							<Button variant="secondary" size="sm" onClick={handleDownloadCSV}>
 								<Download className="h-3.5 w-3.5" />
 								CSV
+							</Button>
+							<Button
+								variant="primary"
+								size="sm"
+								className="bg-green-600 hover:bg-green-700"
+								onClick={handleSalvaInStorico}
+							>
+								<Check className="h-3.5 w-3.5" />
+								Salva in Storico
 							</Button>
 						</div>
 					}

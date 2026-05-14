@@ -1,9 +1,6 @@
-import { useState } from 'react'
-
 import { BOLLETTA_LUCE_DEFAULT, useAppStore } from '@/store/useAppStore'
 import type { BollettaLuce } from '@/types'
 import {
-	Alert,
 	Button,
 	Card,
 	CardContent,
@@ -15,34 +12,25 @@ import {
 
 export function BollettaLuceStep() {
 	const { bollettaLuce, setBollettaLuce, setActiveStep } = useAppStore()
-	const [form, setForm] = useState<BollettaLuce>(bollettaLuce)
-	const [saved, setSaved] = useState(false)
 
 	const set = <K extends keyof BollettaLuce>(
 		key: K,
 		value: BollettaLuce[K],
 	) => {
-		setSaved(false)
-		setForm((p) => ({ ...p, [key]: value }))
+		setBollettaLuce({ ...bollettaLuce, [key]: value })
 	}
 
 	const num = (key: keyof BollettaLuce) => (v: number) => set(key, v as never)
 
-	const handleSave = (e: React.FormEvent) => {
-		e.preventDefault()
-		setBollettaLuce(form)
-		setSaved(true)
-	}
-
 	const handleReset = () => {
-		setForm(BOLLETTA_LUCE_DEFAULT)
-		setSaved(false)
+		setBollettaLuce(BOLLETTA_LUCE_DEFAULT)
 	}
 
-	const isValid = form.totaleBolletta > 0
+	const isValid =
+		bollettaLuce.totaleBolletta > 0 && bollettaLuce.numeroBolletta.trim() !== ''
 
 	return (
-		<form onSubmit={handleSave} className="flex flex-col gap-6">
+		<div className="flex flex-col gap-6">
 			<Card>
 				<CardHeader>
 					<CardTitle>Periodo e Dati Fattura</CardTitle>
@@ -52,32 +40,32 @@ export function BollettaLuceStep() {
 						<Input
 							label="Data inizio periodo"
 							type="date"
-							value={form.dataInizio}
+							value={bollettaLuce.dataInizio}
 							onChange={(e) => set('dataInizio', e.target.value)}
 						/>
 						<Input
 							label="Data fine periodo"
 							type="date"
-							value={form.dataFine}
+							value={bollettaLuce.dataFine}
 							onChange={(e) => set('dataFine', e.target.value)}
 						/>
 						<Input
 							label="Data scadenza pagamento"
 							type="date"
-							value={form.dataScadenza}
+							value={bollettaLuce.dataScadenza}
 							onChange={(e) => set('dataScadenza', e.target.value)}
 						/>
 					</div>
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 						<Input
 							label="Numero Bolletta"
-							value={form.numeroBolletta}
+							value={bollettaLuce.numeroBolletta}
 							onChange={(e) => set('numeroBolletta', e.target.value)}
 							placeholder="Es. 12345678"
 						/>
 						<Input
 							label="Via Condominio"
-							value={form.viaCondominio}
+							value={bollettaLuce.viaCondominio}
 							onChange={(e) => set('viaCondominio', e.target.value)}
 							placeholder="Es. Via Roma, 123"
 						/>
@@ -86,7 +74,7 @@ export function BollettaLuceStep() {
 						<Input
 							label="Data del documento"
 							type="date"
-							value={form.dataDocumento}
+							value={bollettaLuce.dataDocumento}
 							onChange={(e) => set('dataDocumento', e.target.value)}
 						/>
 					</div>
@@ -101,7 +89,7 @@ export function BollettaLuceStep() {
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 						<NumberInput
 							label="Importo Totale Bolletta"
-							value={form.totaleBolletta}
+							value={bollettaLuce.totaleBolletta}
 							onChange={num('totaleBolletta')}
 							suffix="€"
 							min={0}
@@ -109,7 +97,7 @@ export function BollettaLuceStep() {
 						/>
 						<NumberInput
 							label="Spese Postali / Commissioni"
-							value={form.spesePostali}
+							value={bollettaLuce.spesePostali}
 							onChange={num('spesePostali')}
 							suffix="€"
 							min={0}
@@ -117,7 +105,7 @@ export function BollettaLuceStep() {
 						/>
 						<NumberInput
 							label="Spese Gestione / Cancelleria"
-							value={form.speseGestione}
+							value={bollettaLuce.speseGestione}
 							onChange={num('speseGestione')}
 							suffix="€"
 							min={0}
@@ -126,10 +114,6 @@ export function BollettaLuceStep() {
 					</div>
 				</CardContent>
 			</Card>
-
-			{saved && (
-				<Alert variant="success">Dati bolletta salvati correttamente.</Alert>
-			)}
 
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<Button type="button" variant="ghost" onClick={handleReset}>
@@ -143,20 +127,16 @@ export function BollettaLuceStep() {
 					>
 						← Condomini
 					</Button>
-					<Button type="submit" disabled={!isValid}>
-						Salva bolletta
+					<Button
+						type="button"
+						variant="primary"
+						disabled={!isValid}
+						onClick={() => setActiveStep('risultati')}
+					>
+						Continua → Risultati
 					</Button>
-					{saved && (
-						<Button
-							type="button"
-							variant="success"
-							onClick={() => setActiveStep('risultati')}
-						>
-							Continua → Risultati
-						</Button>
-					)}
 				</div>
 			</div>
-		</form>
+		</div>
 	)
 }

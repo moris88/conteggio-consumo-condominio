@@ -1,7 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import type { AppStep, BollettaAcqua, BollettaLuce, Condomino } from '@/types'
+import type {
+	AppStep,
+	BollettaAcqua,
+	BollettaLuce,
+	Condomino,
+	StoricoBolletta,
+} from '@/types'
 
 const oggi = new Date().toISOString().split('T')[0]
 const treMesiFa = new Date()
@@ -56,6 +62,8 @@ interface AppStore {
 	bollettaLuce: BollettaLuce
 	type: 'acqua' | 'luce'
 	activeStep: AppStep
+	storico: StoricoBolletta[]
+	// Actions
 	addCondomino: (
 		data: Omit<Condomino, 'id' | 'letturaAttuale' | 'letturaPrecedente'>,
 	) => void
@@ -67,21 +75,30 @@ interface AppStore {
 	setType: (type: 'acqua' | 'luce') => void
 	setActiveStep: (step: AppStep) => void
 	reset: () => void
+	svuotaStorico: () => void
+	// History Actions
+	salvaInStorico: (note?: string) => void
+	caricaDaStorico: (id: string) => void
+	eliminaDaStorico: (id: string) => void
+	updateNotaStorico: (id: string, note: string) => void
+	importaDati: (dati: Partial<AppStore>) => void
 }
 
 export const useAppStore = create<AppStore>()(
 	persist(
-		(set) => ({
+		(set, get) => ({
 			condominiAcqua: [],
 			condominiLuce: [],
 			bolletta: BOLLETTA_DEFAULT,
 			bollettaLuce: BOLLETTA_LUCE_DEFAULT,
 			type: 'acqua',
 			activeStep: 'condomini',
+			storico: [],
 
 			addCondomino: (data) =>
 				set((state) => {
-					const key = state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
+					const key =
+						state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
 					return {
 						[key]: [
 							...state[key],
@@ -97,7 +114,8 @@ export const useAppStore = create<AppStore>()(
 
 			updateCondomino: (id, updates) =>
 				set((state) => {
-					const key = state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
+					const key =
+						state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
 					return {
 						[key]: state[key].map((c: Condomino) =>
 							c.id === id ? { ...c, ...updates } : c,
@@ -107,7 +125,8 @@ export const useAppStore = create<AppStore>()(
 
 			deleteCondomino: (id) =>
 				set((state) => {
-					const key = state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
+					const key =
+						state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
 					return {
 						[key]: state[key].filter((c: Condomino) => c.id !== id),
 					}
@@ -115,7 +134,8 @@ export const useAppStore = create<AppStore>()(
 
 			setCondomini: (condomini) =>
 				set((state) => {
-					const key = state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
+					const key =
+						state.type === 'acqua' ? 'condominiAcqua' : 'condominiLuce'
 					return { [key]: condomini }
 				}),
 
@@ -136,16 +156,92 @@ export const useAppStore = create<AppStore>()(
 					type: 'acqua',
 					activeStep: 'condomini',
 				}),
+
+			svuotaStorico: () => set({ storico: [] }),
+
+			salvaInStorico: (note = '') => {
+				const state = get()
+				const currentBolletta =
+					state.type === 'acqua' ? state.bolletta : state.bollettaLuce
+				const numero = currentBolletta.numeroBolletta
+
+				if (!numero) return
+
+				const id = `${state.type}-${numero}`
+
+				const nuovaBolletta: StoricoBolletta = {
+					id,
+					dataInserimento: new Date().toISOString(),
+					tipo: state.type,
+					bolletta: currentBolletta,
+					condomini:
+						state.type === 'acqua' ? state.condominiAcqua : state.condominiLuce,
+					note,
+					locked: false,
+				}
+
+				set((state) => {
+					const index = state.storico.findIndex((item) => item.id === id)
+					if (index >= 0) {
+						const nuovoStorico = [...state.storico]
+						// Keep original insertion date when updating
+						nuovaBolletta.dataInserimento = state.storico[index].dataInserimento
+						nuovoStorico[index] = nuovaBolletta
+						return { storico: nuovoStorico }
+					}
+					return { storico: [nuovaBolletta, ...state.storico] }
+				})
+			},
+
+			caricaDaStorico: (id) => {
+				const item = get().storico.find((s) => s.id === id)
+				if (!item) return
+
+				if (item.tipo === 'acqua') {
+					set({
+						type: 'acqua',
+						bolletta: item.bolletta as BollettaAcqua,
+						condominiAcqua: item.condomini,
+						activeStep: 'risultati',
+					})
+				} else {
+					set({
+						type: 'luce',
+						bollettaLuce: item.bolletta as BollettaLuce,
+						condominiLuce: item.condomini,
+						activeStep: 'risultati',
+					})
+				}
+			},
+
+			eliminaDaStorico: (id) =>
+				set((state) => ({
+					storico: state.storico.filter((s) => s.id !== id),
+				})),
+
+			updateNotaStorico: (id, note) =>
+				set((state) => ({
+					storico: state.storico.map((s) => (s.id === id ? { ...s, note } : s)),
+				})),
+
+			importaDati: (dati) => set((state) => ({ ...state, ...dati })),
 		}),
 		{
-			name: 'condominio-acqua-v3',
-			version: 3,
+			name: 'condominio-acqua-v4',
+			version: 4,
 			migrate: (persistedState: any, version: number) => {
 				if (version < 3 && persistedState && persistedState.condomini) {
 					return {
 						...persistedState,
 						condominiAcqua: persistedState.condomini,
 						condominiLuce: persistedState.condomini,
+						storico: [],
+					}
+				}
+				if (version < 4) {
+					return {
+						...persistedState,
+						storico: [],
 					}
 				}
 				return persistedState

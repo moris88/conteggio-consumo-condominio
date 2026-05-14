@@ -1,12 +1,12 @@
-import { RotateCameraRight as RotateRight } from 'iconoir-react'
+import { Check, RotateCameraRight as RotateRight } from 'iconoir-react'
 import { useMemo } from 'react'
-
 import {
 	BollettaLuceStep,
 	BollettaStep,
 	CondominiStep,
 	ConsumiStep,
 	RisultatiStep,
+	StoricoStep,
 } from '@/components'
 import { Stepper } from '@/components/ui/Stepper'
 import { useAppStore } from '@/store/useAppStore'
@@ -59,43 +59,63 @@ export function App() {
 							Ripartizione spese condominiali
 						</p>
 					</div>
-					<Tooltip content="Resetta tutti i dati" placement="left">
-						<button
-							type="button"
-							onClick={() => {
-								if (
-									confirm(
-										"Vuoi azzerare tutti i dati? L'operazione non è reversibile.",
-									)
-								) {
-									reset()
-								}
-							}}
-							className="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-slate-500 text-xs transition-colors hover:bg-slate-100 hover:text-slate-700"
-							title="Azzera tutto"
+					<div className="flex items-center gap-3">
+						<Tooltip
+							content="Visualizza lo storico delle bollette"
+							placement="left"
 						>
-							<RotateRight className="h-3.5 w-3.5" />
-							Reset
-						</button>
-					</Tooltip>
+							<button
+								type="button"
+								onClick={() => setActiveStep('storico')}
+								className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors ${
+									activeStep === 'storico'
+										? 'bg-blue-50 text-blue-600'
+										: 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+								}`}
+							>
+								<Check className="h-3.5 w-3.5" />
+								Storico
+							</button>
+						</Tooltip>
+						<Tooltip content="Resetta tutti i dati" placement="left">
+							<button
+								type="button"
+								onClick={() => {
+									if (
+										confirm(
+											"Vuoi azzerare tutti i dati? L'operazione non è reversibile.",
+										)
+									) {
+										reset()
+									}
+								}}
+								className="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-slate-500 text-xs transition-colors hover:bg-slate-100 hover:text-slate-700"
+								title="Azzera tutto"
+							>
+								<RotateRight className="h-3.5 w-3.5" />
+								Reset
+							</button>
+						</Tooltip>
+					</div>
 				</div>
 			</header>
 
 			<main className="mx-auto max-w-full px-4 py-6">
-				{tabs.map((t) => (
-					<button
-						key={t.id}
-						type="button"
-						onClick={() => setType(t.id as 'acqua' | 'luce')}
-						className={`mr-2 mb-4 rounded-lg px-3 py-1.5 text-sm transition-colors ${
-							type === t.id
-								? 'bg-blue-600 text-white'
-								: 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-						}`}
-					>
-						{t.label}
-					</button>
-				))}
+				{activeStep !== 'storico' &&
+					tabs.map((t) => (
+						<button
+							key={t.id}
+							type="button"
+							onClick={() => setType(t.id as 'acqua' | 'luce')}
+							className={`mr-2 mb-4 rounded-lg px-3 py-1.5 text-sm transition-colors ${
+								type === t.id
+									? 'bg-blue-600 text-white'
+									: 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+							}`}
+						>
+							{t.label}
+						</button>
+					))}
 
 				<div className="mb-6 rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
 					<Stepper
@@ -110,6 +130,7 @@ export function App() {
 					(isAcqua ? <BollettaStep /> : <BollettaLuceStep />)}
 				{activeStep === 'consumi' && isAcqua && <ConsumiStep />}
 				{activeStep === 'risultati' && <RisultatiStep />}
+				{activeStep === 'storico' && <StoricoStep />}
 			</main>
 		</div>
 	)

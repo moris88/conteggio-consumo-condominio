@@ -8,18 +8,12 @@ describe('BollettaStep', () => {
 		useAppStore.getState().reset()
 	})
 
-	it('permette di inserire i dati della bolletta e salvare', () => {
+	it('aggiorna i dati della bolletta automaticamente al cambio input', () => {
 		render(<BollettaStep />)
 
 		const consumoInput = screen.getByLabelText(/Consumo totale dichiarato/i)
-		const saveBtn = screen.getByText('Salva bolletta')
-
 		fireEvent.change(consumoInput, { target: { value: '100' } })
-		fireEvent.click(saveBtn)
 
-		expect(
-			screen.getByText('Dati bolletta salvati correttamente.'),
-		).toBeDefined()
 		expect(useAppStore.getState().bolletta.consumoTotale).toBe(100)
 	})
 
@@ -45,8 +39,6 @@ describe('BollettaStep', () => {
 			fireEvent.change(input, { target: { value: field.value } })
 		}
 
-		fireEvent.click(screen.getByText('Salva bolletta'))
-
 		const bolletta = useAppStore.getState().bolletta
 		expect(bolletta.consumoTotale).toBe(150)
 		expect(bolletta.quotaFissa).toBe(25.5)
@@ -64,7 +56,7 @@ describe('BollettaStep', () => {
 
 		fireEvent.click(screen.getByText('Azzera dati bolletta'))
 
-		expect(consumoInput).toHaveValue(null) // NumberInput renders 0 as empty string
+		expect(useAppStore.getState().bolletta.consumoTotale).toBe(0)
 	})
 
 	it('permette di tornare allo step precedente', () => {
@@ -73,13 +65,19 @@ describe('BollettaStep', () => {
 		expect(useAppStore.getState().activeStep).toBe('condomini')
 	})
 
-	it('permette di procedere allo step successivo dopo il salvataggio', () => {
+	it('permette di procedere allo step successivo se valida', () => {
 		render(<BollettaStep />)
-		const consumoInput = screen.getByLabelText(/Consumo totale dichiarato/i)
-		fireEvent.change(consumoInput, { target: { value: '100' } })
-		fireEvent.click(screen.getByText('Salva bolletta'))
+		const nextBtn = screen.getByText('Continua → Consumi')
+		expect(nextBtn).toBeDisabled()
 
-		fireEvent.click(screen.getByText('Continua → Consumi'))
+		const consumoInput = screen.getByLabelText(/Consumo totale dichiarato/i)
+		const numeroInput = screen.getByLabelText(/Numero Bolletta/i)
+
+		fireEvent.change(consumoInput, { target: { value: '100' } })
+		fireEvent.change(numeroInput, { target: { value: '123' } })
+
+		expect(nextBtn).not.toBeDisabled()
+		fireEvent.click(nextBtn)
 		expect(useAppStore.getState().activeStep).toBe('consumi')
 	})
 })

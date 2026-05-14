@@ -120,11 +120,27 @@ export interface RisultatoCalcolo {
 	totali: TotaliRisultato
 }
 
-export type AppStep = 'condomini' | 'bolletta' | 'consumi' | 'risultati'
+export type AppStep =
+	| 'condomini'
+	| 'bolletta'
+	| 'consumi'
+	| 'risultati'
+	| 'storico'
 
 export const APP_STEPS: { id: AppStep; label: string; shortLabel: string }[] = [
 	{ id: 'condomini', label: 'Condomini', shortLabel: '1' },
 	{ id: 'bolletta', label: 'Bolletta', shortLabel: '2' },
 	{ id: 'consumi', label: 'Consumi', shortLabel: '3' },
 	{ id: 'risultati', label: 'Risultati', shortLabel: '4' },
+	{ id: 'storico', label: 'Storico', shortLabel: '5' },
 ]
+
+export interface StoricoBolletta {
+	id: string
+	dataInserimento: string
+	tipo: 'acqua' | 'luce'
+	bolletta: BollettaAcqua | BollettaLuce
+	condomini: Condomino[]
+	note: string
+	locked: boolean
+}
