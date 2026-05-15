@@ -125,6 +125,78 @@ describe('CondominiStep', () => {
 		expect(useAppStore.getState().activeStep).toBe('bolletta')
 	})
 
+	it('salva la modifica di un condomino', async () => {
+		await act(async () => {
+			useAppStore.getState().addCondomino({
+				nome: 'Mario',
+				cognome: 'Rossi',
+				appartamento: 'A1',
+				tipo: 'proprietario-residente',
+			})
+		})
+
+		render(<CondominiStep />)
+
+		// Apri il modal di modifica
+		const editBtn = screen.getByRole('button', { name: /Modifica/i })
+		await act(async () => {
+			fireEvent.click(editBtn)
+		})
+
+		// Modifica il cognome nel modal
+		const cognomeInput = screen.getByLabelText('Cognome')
+		fireEvent.change(cognomeInput, { target: { value: 'Bianchi' } })
+
+		// Salva
+		const saveBtn = screen.getByText('Salva')
+		await act(async () => {
+			fireEvent.click(saveBtn)
+		})
+
+		expect(useAppStore.getState().condominiAcqua[0].cognome).toBe('Bianchi')
+	})
+
+	it('annulla la modifica di un condomino senza salvare', async () => {
+		await act(async () => {
+			useAppStore.getState().addCondomino({
+				nome: 'Mario',
+				cognome: 'Rossi',
+				appartamento: 'A1',
+				tipo: 'proprietario-residente',
+			})
+		})
+
+		render(<CondominiStep />)
+
+		const editBtn = screen.getByRole('button', { name: /Modifica/i })
+		await act(async () => {
+			fireEvent.click(editBtn)
+		})
+
+		// Modifica ma poi annulla
+		const cognomeInput = screen.getByLabelText('Cognome')
+		fireEvent.change(cognomeInput, { target: { value: 'Verdi' } })
+
+		const cancelBtn = screen.getByText('Annulla')
+		await act(async () => {
+			fireEvent.click(cancelBtn)
+		})
+
+		// Il cognome non deve essere cambiato
+		expect(useAppStore.getState().condominiAcqua[0].cognome).toBe('Rossi')
+	})
+
+	it('mostra errori di validazione se i campi obbligatori sono vuoti', () => {
+		render(<CondominiStep />)
+
+		const addBtn = screen.getByText('Aggiungi')
+		fireEvent.click(addBtn)
+
+		const errors = screen.getAllByText('Campo obbligatorio')
+		expect(errors.length).toBeGreaterThan(0)
+		expect(useAppStore.getState().condominiAcqua).toHaveLength(0)
+	})
+
 	it('importa i condomini da JSON', async () => {
 		const mockData = [
 			{

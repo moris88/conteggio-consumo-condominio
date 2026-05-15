@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import type { BollettaAcqua, Condomino } from '@/types'
+import type { BollettaAcqua, BollettaLuce, Condomino } from '@/types'
 import {
 	calcolaDiscrepanza,
 	calcolaRisultati,
+	calcolaRisultatiLuce,
 	fmt,
 	fmtEur,
 	fmtMc,
@@ -174,5 +175,128 @@ describe('funzioni di formattazione', () => {
 
 	it('fmtMc arrotonda a intero e aggiunge mc', () => {
 		expect(fmtMc(37.5)).toBe('38 mc')
+	})
+
+	it('fmtMc con zero', () => {
+		expect(fmtMc(0)).toBe('0 mc')
+	})
+
+	it('fmt con decimali custom', () => {
+		expect(fmt(1.5, 0)).toBe('2')
+		expect(fmt(Math.PI, 3)).toBe('3,142')
+	})
+})
+
+describe('calcolaRisultatiLuce', () => {
+	const CONDOMINI_LUCE: Condomino[] = [
+		{
+			id: '1',
+			nome: 'Mario',
+			cognome: 'Rossi',
+			appartamento: 'A1',
+			tipo: 'proprietario-residente' as const,
+			letturaAttuale: 0,
+			letturaPrecedente: 0,
+		},
+		{
+			id: '2',
+			nome: 'Luigi',
+			cognome: 'Verdi',
+			appartamento: 'B2',
+			tipo: 'inquilino' as const,
+			letturaAttuale: 0,
+			letturaPrecedente: 0,
+		},
+	]
+
+	const BOLLETTA_LUCE: BollettaLuce = {
+		dataInizio: '2025-01-01',
+		dataFine: '2025-03-31',
+		dataScadenza: '2025-04-15',
+		numeroBolletta: 'LUCE-001',
+		viaCondominio: '',
+		dataDocumento: '2025-04-01',
+		totaleBolletta: 100,
+		spesePostali: 4,
+		speseGestione: 2,
+		rettificaAcconti: 10,
+	}
+
+	it('divide equamente il totale tra tutti i condomini', () => {
+		const risultato = calcolaRisultatiLuce(CONDOMINI_LUCE, BOLLETTA_LUCE)
+		expect(risultato.righe).toHaveLength(2)
+		expect(risultato.righe[0].quotaBase).toBeCloseTo(50, 2)
+		expect(risultato.righe[1].quotaBase).toBeCloseTo(50, 2)
+	})
+
+	it('divide equamente spese postali e gestione', () => {
+		const risultato = calcolaRisultatiLuce(CONDOMINI_LUCE, BOLLETTA_LUCE)
+		expect(risultato.righe[0].spesePostali).toBeCloseTo(2, 2)
+		expect(risultato.righe[0].speseGestione).toBeCloseTo(1, 2)
+	})
+
+	it('include rettificaAcconti nel totaleDaPagare', () => {
+		const risultato = calcolaRisultatiLuce(CONDOMINI_LUCE, BOLLETTA_LUCE)
+		// 50 + 2 + 1 + 5 = 58
+		expect(risultato.righe[0].totaleDaPagare).toBeCloseTo(58, 2)
+	})
+
+	it('calcola correttamente i totali', () => {
+		const risultato = calcolaRisultatiLuce(CONDOMINI_LUCE, BOLLETTA_LUCE)
+		expect(risultato.totali.quotaBase).toBe(100)
+		expect(risultato.totali.spesePostali).toBe(4)
+		expect(risultato.totali.speseGestione).toBe(2)
+		expect(risultato.totali.rettificaAcconti).toBe(10)
+		expect(risultato.totali.totaleDaPagare).toBe(116)
+	})
+
+	it('gestisce array vuoto senza errori (divisione per 1)', () => {
+		const risultato = calcolaRisultatiLuce([], BOLLETTA_LUCE)
+		expect(risultato.righe).toHaveLength(0)
+		expect(risultato.totali.totaleDaPagare).toBe(116)
+	})
+
+	it('setta discrepanza sempre a zero per luce', () => {
+		const risultato = calcolaRisultatiLuce(CONDOMINI_LUCE, BOLLETTA_LUCE)
+		expect(risultato.discrepanzaMC).toBe(0)
+		expect(risultato.discrepanzaPercent).toBe(0)
+		expect(risultato.discrepanzaElevata).toBe(false)
+	})
+})
+
+describe('calcolaRisultati - casi limite', () => {
+	it('gestisce consumoRealeTotale = 0 (coeff = 0 per tutti)', () => {
+		const condomini = [
+			{
+				...BERLOCO,
+				letturaAttuale: 0,
+				letturaPrecedente: 0,
+			},
+		]
+		const risultato = calcolaRisultati(condomini, BOLLETTA_PDF)
+		expect(risultato.righe[0].coeffProporzionale).toBe(0)
+		expect(risultato.righe[0].tariffaAgevolata).toBe(0)
+	})
+
+	it('con un solo condomino paga tutta la quota fissa', () => {
+		const risultato = calcolaRisultati([BERLOCO], {
+			...BOLLETTA_PDF,
+			eccedenzaBase: 0,
+			eccedenzaFascia1: 0,
+			eccedenzaFascia2: 0,
+			eccedenzaFascia3: 0,
+			tariffaAgevolata: 0,
+			quotaFogna: 0,
+			quotaDepurazione: 0,
+			quotaPerequazione: 0,
+			iva: 0,
+			rettificaAcconti: 0,
+			spesePostali: 0,
+			speseGestione: 0,
+		})
+		expect(risultato.righe[0].quotaFissa).toBeCloseTo(
+			BOLLETTA_PDF.quotaFissa,
+			2,
+		)
 	})
 })

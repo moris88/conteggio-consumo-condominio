@@ -131,6 +131,11 @@ function RigaTabellaLuce({ riga }: { riga: RigaRisultato }) {
 			</TCell>
 			<TCell>{fmtEur(riga.spesePostali)}</TCell>
 			<TCell>{riga.speseGestione > 0 ? fmtEur(riga.speseGestione) : '—'}</TCell>
+			<TCell>
+				{(riga.rettificaAcconti ?? 0) !== 0
+					? fmtEur(riga.rettificaAcconti ?? 0)
+					: '—'}
+			</TCell>
 			<TCell bold highlight>
 				{fmtEur(riga.totaleDaPagare)}
 			</TCell>
@@ -489,6 +494,7 @@ export function RisultatiStep() {
 										<THead>Quota Base (€)</THead>
 										<THead>Commissioni / Sp. Postali (€)</THead>
 										<THead>Sp. Gestione / Cancelleria (€)</THead>
+										<THead>Rettifica / Acconti (€)</THead>
 										<THead>TOTALE DA PAGARE (€)</THead>
 									</tr>
 								</thead>
@@ -507,6 +513,11 @@ export function RisultatiStep() {
 										</TCell>
 										<TCell bold>{fmtEur(t.spesePostali)}</TCell>
 										<TCell bold>{fmtEur(t.speseGestione)}</TCell>
+										<TCell bold>
+											{(t.rettificaAcconti ?? 0) !== 0
+												? fmtEur(t.rettificaAcconti ?? 0)
+												: '—'}
+										</TCell>
 										<TCell bold highlight>
 											{fmtEur(t.totaleDaPagare)}
 										</TCell>
@@ -555,6 +566,12 @@ export function RisultatiStep() {
 											<strong>Importo Bolletta Luce:</strong>{' '}
 											{fmtEur(bollettaLuce.totaleBolletta)}
 										</p>
+										{bollettaLuce.rettificaAcconti !== 0 && (
+											<p>
+												<strong>Rettifica / Acconti:</strong>{' '}
+												{fmtEur(bollettaLuce.rettificaAcconti)}
+											</p>
+										)}
 									</div>
 									<div className="space-y-1">
 										<p>

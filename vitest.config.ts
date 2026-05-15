@@ -21,6 +21,7 @@ export default defineConfig({
         "src/utils/esporta.ts",
         "src/store/useAppStore.ts",
         "src/components/BollettaStep.tsx",
+        "src/components/BollettaLuceStep.tsx",
         "src/components/CondominiStep.tsx",
         "src/components/RisultatiStep.tsx",
         "src/components/ConsumiStep.tsx",
@@ -32,6 +33,8 @@ export default defineConfig({
         "src/components/ui/Separator.tsx",
         "src/components/ui/Badge.tsx",
         "src/components/ui/Stepper.tsx",
+        "src/components/ui/Select.tsx",
+        "src/components/ui/Modal.tsx",
       ],
       thresholds: {
         lines: 70,

@@ -39,6 +39,8 @@ describe('RisultatiStep', () => {
 	beforeEach(() => {
 		useAppStore.getState().reset()
 		vi.clearAllMocks()
+		vi.stubGlobal('prompt', vi.fn(() => 'Nota test'))
+		vi.stubGlobal('alert', vi.fn())
 	})
 
 	it('mostra avviso se non ci sono dati sufficienti', () => {
@@ -139,6 +141,64 @@ describe('RisultatiStep', () => {
 		})
 
 		expect(globalThis.URL.createObjectURL).toHaveBeenCalled()
+	})
+
+	it('salva i risultati nello storico', async () => {
+		await act(async () => {
+			useAppStore.getState().addCondomino({
+				nome: 'Mario',
+				cognome: 'Rossi',
+				appartamento: 'A1',
+				tipo: 'proprietario-residente',
+			})
+			useAppStore
+				.getState()
+				.updateCondomino(useAppStore.getState().condominiAcqua[0].id, {
+					letturaPrecedente: 10,
+					letturaAttuale: 20,
+				})
+			useAppStore.getState().setBolletta({
+				...useAppStore.getState().bolletta,
+				consumoTotale: 10,
+				numeroBolletta: 'TEST-STOR',
+			})
+		})
+
+		render(<RisultatiStep />)
+
+		const saveBtn = screen.getByRole('button', { name: /Salva in Storico/i })
+		await act(async () => {
+			fireEvent.click(saveBtn)
+		})
+
+		expect(useAppStore.getState().storico).toHaveLength(1)
+	})
+
+	it('mostra alert discrepanza elevata', async () => {
+		await act(async () => {
+			useAppStore.getState().addCondomino({
+				nome: 'Mario',
+				cognome: 'Rossi',
+				appartamento: 'A1',
+				tipo: 'proprietario-residente',
+			})
+			// Consumo reale 10 vs bolletta 100 → discrepanza 90%
+			useAppStore
+				.getState()
+				.updateCondomino(useAppStore.getState().condominiAcqua[0].id, {
+					letturaPrecedente: 10,
+					letturaAttuale: 20,
+				})
+			useAppStore.getState().setBolletta({
+				...useAppStore.getState().bolletta,
+				consumoTotale: 100,
+				sogliaDiscrepanza: 10,
+			})
+		})
+
+		render(<RisultatiStep />)
+
+		expect(screen.getByText(/Discrepanza elevata/i)).toBeDefined()
 	})
 
 	it('visualizza i risultati per la bolletta luce', async () => {

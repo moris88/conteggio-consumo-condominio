@@ -219,7 +219,7 @@ export function BollettaStep() {
 							value={bolletta.rettificaAcconti}
 							onChange={num('rettificaAcconti')}
 							suffix="€"
-							helper="Importo rettifica acconti (positivo = credito da scalare)"
+							helper="Importo rettifica acconti (negativo = credito da scalare)"
 						/>
 						<NumberInput
 							label="Spese Postali (totale)"

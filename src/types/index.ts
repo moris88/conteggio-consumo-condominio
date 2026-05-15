@@ -59,6 +59,7 @@ export interface BollettaLuce {
 	totaleBolletta: number
 	spesePostali: number
 	speseGestione: number
+	rettificaAcconti: number
 }
 
 export interface RigaRisultato {
