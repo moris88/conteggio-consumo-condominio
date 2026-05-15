@@ -225,7 +225,11 @@ export function ConsumiStep() {
 					</div>
 				</CardContent>
 				<CardFooter className="flex-col gap-2 sm:flex-row">
-					<Button variant="secondary" className="w-full sm:w-auto" onClick={() => setActiveStep('bolletta')}>
+					<Button
+						variant="secondary"
+						className="w-full sm:w-auto"
+						onClick={() => setActiveStep('bolletta')}
+					>
 						← Bolletta
 					</Button>
 					<Button

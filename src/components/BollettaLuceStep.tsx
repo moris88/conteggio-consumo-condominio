@@ -123,7 +123,12 @@ export function BollettaLuceStep() {
 			</Card>
 
 			<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-				<Button type="button" variant="ghost" onClick={handleReset} className="w-full sm:w-auto">
+				<Button
+					type="button"
+					variant="ghost"
+					onClick={handleReset}
+					className="w-full sm:w-auto"
+				>
 					Azzera dati bolletta
 				</Button>
 				<div className="flex flex-col gap-2 sm:flex-row sm:gap-3">

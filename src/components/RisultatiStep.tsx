@@ -648,13 +648,13 @@ export function RisultatiStep() {
 				size="sm"
 				footer={
 					<>
-						<Button variant="secondary" onClick={() => setSalvaModalOpen(false)}>
+						<Button
+							variant="secondary"
+							onClick={() => setSalvaModalOpen(false)}
+						>
 							Annulla
 						</Button>
-						<Button
-							variant="success"
-							onClick={confirmSalva}
-						>
+						<Button variant="success" onClick={confirmSalva}>
 							<Check className="h-4 w-4" />
 							Salva
 						</Button>
@@ -688,7 +688,9 @@ export function RisultatiStep() {
 					</Button>
 				}
 			>
-				<div className="px-5 py-4 text-slate-700 text-sm">{infoModal.message}</div>
+				<div className="px-5 py-4 text-slate-700 text-sm">
+					{infoModal.message}
+				</div>
 			</Modal>
 		</div>
 	)
