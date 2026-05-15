@@ -73,6 +73,60 @@ describe('ConsumiStep', () => {
 		expect(useAppStore.getState().activeStep).toBe('risultati')
 	})
 
+	it('mostra badge "Non residente" per condomini non residenti', () => {
+		act(() => {
+			const store = useAppStore.getState()
+			store.addCondomino({
+				nome: 'A',
+				cognome: 'Nonres',
+				appartamento: '2',
+				tipo: 'proprietario-non-residente',
+			})
+			store.setBolletta({ ...store.bolletta, consumoTotale: 50 })
+		})
+
+		render(<ConsumiStep />)
+
+		expect(screen.getByText(/Non residente/i)).toBeDefined()
+	})
+
+	it('mostra alert se bolletta non configurata', () => {
+		act(() => {
+			useAppStore.getState().addCondomino({
+				nome: 'A',
+				cognome: 'B',
+				appartamento: '1',
+				tipo: 'proprietario-residente',
+			})
+			// consumoTotale rimane 0
+		})
+
+		render(<ConsumiStep />)
+		expect(screen.getByText(/Bolletta non configurata/i)).toBeDefined()
+	})
+
+	it('mostra fascia 1 se eccedenzaFascia1 > 0', () => {
+		act(() => {
+			const store = useAppStore.getState()
+			store.addCondomino({
+				nome: 'A',
+				cognome: 'B',
+				appartamento: '1',
+				tipo: 'proprietario-residente',
+			})
+			store.setBolletta({
+				...store.bolletta,
+				consumoTotale: 100,
+				eccedenzaFascia1: 50,
+			})
+		})
+
+		render(<ConsumiStep />)
+		expect(
+			screen.getByLabelText(/Quota minima tariffa fascia 1/i),
+		).toBeDefined()
+	})
+
 	it('aggiorna le soglie e quote minime', () => {
 		act(() => {
 			const store = useAppStore.getState()

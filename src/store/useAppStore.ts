@@ -53,6 +53,7 @@ export const BOLLETTA_LUCE_DEFAULT: BollettaLuce = {
 	totaleBolletta: 0,
 	spesePostali: 0,
 	speseGestione: 0,
+	rettificaAcconti: 0,
 }
 
 interface AppStore {

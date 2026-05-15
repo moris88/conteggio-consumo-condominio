@@ -17,6 +17,7 @@ import {
 	CardContent,
 	CardHeader,
 	CardTitle,
+	Input,
 	Modal,
 	Tooltip,
 } from './ui'
@@ -131,6 +132,11 @@ function RigaTabellaLuce({ riga }: { riga: RigaRisultato }) {
 			</TCell>
 			<TCell>{fmtEur(riga.spesePostali)}</TCell>
 			<TCell>{riga.speseGestione > 0 ? fmtEur(riga.speseGestione) : '—'}</TCell>
+			<TCell>
+				{(riga.rettificaAcconti ?? 0) !== 0
+					? fmtEur(riga.rettificaAcconti ?? 0)
+					: '—'}
+			</TCell>
 			<TCell bold highlight>
 				{fmtEur(riga.totaleDaPagare)}
 			</TCell>
@@ -148,6 +154,13 @@ export function RisultatiStep() {
 	const tableRef = useRef<HTMLDivElement>(null)
 	const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 	const [loadingPdf, setLoadingPdf] = useState(false)
+	const [salvaModalOpen, setSalvaModalOpen] = useState(false)
+	const [salvaModalNota, setSalvaModalNota] = useState('')
+	const [infoModal, setInfoModal] = useState<{
+		open: boolean
+		title: string
+		message: string
+	}>({ open: false, title: '', message: '' })
 
 	const isAcqua = type === 'acqua'
 	const currentBolletta = isAcqua ? bolletta : bollettaLuce
@@ -182,7 +195,12 @@ export function RisultatiStep() {
 
 	const handleDownloadPDF = async () => {
 		if (!currentBolletta.dataScadenza) {
-			alert('Imposta una data di scadenza nella bolletta per esportare il PDF.')
+			setInfoModal({
+				open: true,
+				title: 'Data mancante',
+				message:
+					'Imposta una data di scadenza nella bolletta per esportare il PDF.',
+			})
 			return
 		}
 		await exportToPDF(tableRef, currentBolletta.dataScadenza)
@@ -193,12 +211,14 @@ export function RisultatiStep() {
 	}
 
 	const handleSalvaInStorico = () => {
-		const nota = prompt('Vuoi aggiungere una nota a questa bolletta?')
-		if (nota !== null) {
-			salvaInStorico(nota)
-			alert('Bolletta salvata nello storico con successo!')
-			setActiveStep('storico')
-		}
+		setSalvaModalNota('')
+		setSalvaModalOpen(true)
+	}
+
+	const confirmSalva = () => {
+		salvaInStorico(salvaModalNota)
+		setSalvaModalOpen(false)
+		setActiveStep('storico')
 	}
 
 	return (
@@ -265,9 +285,10 @@ export function RisultatiStep() {
 			</div>
 
 			<Card>
-				<CardHeader
-					actions={
-						<div className="flex flex-col flex-wrap gap-2 md:flex-row">
+				<CardHeader>
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+						<CardTitle>Tabella Ripartizione</CardTitle>
+						<div className="flex flex-wrap gap-2">
 							<Button
 								variant="secondary"
 								size="sm"
@@ -298,9 +319,7 @@ export function RisultatiStep() {
 								Salva in Storico
 							</Button>
 						</div>
-					}
-				>
-					<CardTitle>Tabella Ripartizione</CardTitle>
+					</div>
 				</CardHeader>
 				<CardContent className="p-0">
 					<div ref={tableRef} className="overflow-x-auto bg-white p-4">
@@ -489,6 +508,7 @@ export function RisultatiStep() {
 										<THead>Quota Base (€)</THead>
 										<THead>Commissioni / Sp. Postali (€)</THead>
 										<THead>Sp. Gestione / Cancelleria (€)</THead>
+										<THead>Rettifica / Acconti (€)</THead>
 										<THead>TOTALE DA PAGARE (€)</THead>
 									</tr>
 								</thead>
@@ -507,6 +527,11 @@ export function RisultatiStep() {
 										</TCell>
 										<TCell bold>{fmtEur(t.spesePostali)}</TCell>
 										<TCell bold>{fmtEur(t.speseGestione)}</TCell>
+										<TCell bold>
+											{(t.rettificaAcconti ?? 0) !== 0
+												? fmtEur(t.rettificaAcconti ?? 0)
+												: '—'}
+										</TCell>
 										<TCell bold highlight>
 											{fmtEur(t.totaleDaPagare)}
 										</TCell>
@@ -555,6 +580,12 @@ export function RisultatiStep() {
 											<strong>Importo Bolletta Luce:</strong>{' '}
 											{fmtEur(bollettaLuce.totaleBolletta)}
 										</p>
+										{bollettaLuce.rettificaAcconti !== 0 && (
+											<p>
+												<strong>Rettifica / Acconti:</strong>{' '}
+												{fmtEur(bollettaLuce.rettificaAcconti)}
+											</p>
+										)}
 									</div>
 									<div className="space-y-1">
 										<p>
@@ -607,6 +638,59 @@ export function RisultatiStep() {
 						style={{ height: '75vh' }}
 					/>
 				)}
+			</Modal>
+
+			{/* Modal salva in storico */}
+			<Modal
+				open={salvaModalOpen}
+				onClose={() => setSalvaModalOpen(false)}
+				title="Salva in Storico"
+				size="sm"
+				footer={
+					<>
+						<Button
+							variant="secondary"
+							onClick={() => setSalvaModalOpen(false)}
+						>
+							Annulla
+						</Button>
+						<Button variant="success" onClick={confirmSalva}>
+							<Check className="h-4 w-4" />
+							Salva
+						</Button>
+					</>
+				}
+			>
+				<div className="flex flex-col gap-3 px-5 py-4">
+					<p className="text-slate-600 text-sm">
+						La bolletta verrà salvata nello storico. Puoi aggiungere una nota
+						opzionale per identificarla più facilmente.
+					</p>
+					<Input
+						label="Nota (opzionale)"
+						value={salvaModalNota}
+						onChange={(e) => setSalvaModalNota(e.target.value)}
+						placeholder="Es. Bolletta dicembre 2025"
+						autoFocus
+					/>
+				</div>
+			</Modal>
+
+			{/* Modal informativo / errori */}
+			<Modal
+				open={infoModal.open}
+				onClose={() => setInfoModal((s) => ({ ...s, open: false }))}
+				title={infoModal.title}
+				size="sm"
+				footer={
+					<Button onClick={() => setInfoModal((s) => ({ ...s, open: false }))}>
+						OK
+					</Button>
+				}
+			>
+				<div className="px-5 py-4 text-slate-700 text-sm">
+					{infoModal.message}
+				</div>
 			</Modal>
 		</div>
 	)

@@ -60,7 +60,7 @@ export function CardFooter({ children, className }: CardProps) {
 	return (
 		<div
 			className={cn(
-				'flex items-center justify-end gap-3 border-slate-100 border-t px-5 py-3',
+				'flex flex-wrap items-center justify-end gap-3 border-slate-100 border-t px-5 py-3',
 				className,
 			)}
 		>

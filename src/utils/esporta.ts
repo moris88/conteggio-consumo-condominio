@@ -132,6 +132,7 @@ function rigaLuceToCSV(r: RigaRisultato): string {
 		fmt(r.quotaBase || 0),
 		fmt(r.spesePostali),
 		fmt(r.speseGestione),
+		fmt(r.rettificaAcconti ?? 0),
 		fmt(r.totaleDaPagare),
 	]
 	return cols.join(';')
@@ -221,6 +222,7 @@ export function exportToCSV(
 			'Quota Base (€)',
 			'Spese Postali / Commissioni (€)',
 			'Spese Gestione / Cancelleria (€)',
+			'Rettifica / Acconti (€)',
 			'Totale Da Pagare (€)',
 		].join(';')
 
@@ -231,6 +233,7 @@ export function exportToCSV(
 			fmt(t.quotaBase || 0),
 			fmt(t.spesePostali),
 			fmt(t.speseGestione),
+			fmt(t.rettificaAcconti ?? 0),
 			fmt(t.totaleDaPagare),
 		].join(';')
 

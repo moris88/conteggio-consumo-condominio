@@ -141,6 +141,80 @@ describe('RisultatiStep', () => {
 		expect(globalThis.URL.createObjectURL).toHaveBeenCalled()
 	})
 
+	it('salva i risultati nello storico tramite modal', async () => {
+		await act(async () => {
+			useAppStore.getState().addCondomino({
+				nome: 'Mario',
+				cognome: 'Rossi',
+				appartamento: 'A1',
+				tipo: 'proprietario-residente',
+			})
+			useAppStore
+				.getState()
+				.updateCondomino(useAppStore.getState().condominiAcqua[0].id, {
+					letturaPrecedente: 10,
+					letturaAttuale: 20,
+				})
+			useAppStore.getState().setBolletta({
+				...useAppStore.getState().bolletta,
+				consumoTotale: 10,
+				numeroBolletta: 'TEST-STOR',
+			})
+		})
+
+		render(<RisultatiStep />)
+
+		// Apre il modal
+		const saveBtn = screen.getByRole('button', { name: /Salva in Storico/i })
+		await act(async () => {
+			fireEvent.click(saveBtn)
+		})
+
+		// Il modal è aperto (verifica presenza input nota)
+		expect(screen.getByPlaceholderText(/Bolletta dicembre/i)).toBeDefined()
+
+		// Inserisce una nota
+		const notaInput = screen.getByPlaceholderText(/Bolletta dicembre/i)
+		fireEvent.change(notaInput, { target: { value: 'Nota dal test' } })
+
+		// Conferma il salvataggio
+		const confirmBtn = screen.getByRole('button', { name: /^Salva$/i })
+		await act(async () => {
+			fireEvent.click(confirmBtn)
+		})
+
+		expect(useAppStore.getState().storico).toHaveLength(1)
+		expect(useAppStore.getState().storico[0].note).toBe('Nota dal test')
+		expect(useAppStore.getState().activeStep).toBe('storico')
+	})
+
+	it('mostra alert discrepanza elevata', async () => {
+		await act(async () => {
+			useAppStore.getState().addCondomino({
+				nome: 'Mario',
+				cognome: 'Rossi',
+				appartamento: 'A1',
+				tipo: 'proprietario-residente',
+			})
+			// Consumo reale 10 vs bolletta 100 → discrepanza 90%
+			useAppStore
+				.getState()
+				.updateCondomino(useAppStore.getState().condominiAcqua[0].id, {
+					letturaPrecedente: 10,
+					letturaAttuale: 20,
+				})
+			useAppStore.getState().setBolletta({
+				...useAppStore.getState().bolletta,
+				consumoTotale: 100,
+				sogliaDiscrepanza: 10,
+			})
+		})
+
+		render(<RisultatiStep />)
+
+		expect(screen.getByText(/Discrepanza elevata/i)).toBeDefined()
+	})
+
 	it('visualizza i risultati per la bolletta luce', async () => {
 		await act(async () => {
 			useAppStore.getState().setType('luce')

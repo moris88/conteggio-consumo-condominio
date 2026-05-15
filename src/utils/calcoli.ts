@@ -293,21 +293,27 @@ export function calcolaRisultatiLuce(
 	const quotaBase = bolletta.totaleBolletta / n
 	const spesePostali = bolletta.spesePostali / n
 	const speseGestione = bolletta.speseGestione / n
+	const rettificaAcconti = (bolletta.rettificaAcconti ?? 0) / n
 
 	const righe: RigaRisultato[] = condomini.map((condomino) => ({
 		condomino,
 		quotaBase,
 		spesePostali,
 		speseGestione,
-		totaleDaPagare: quotaBase + spesePostali + speseGestione,
+		rettificaAcconti,
+		totaleDaPagare: quotaBase + spesePostali + speseGestione + rettificaAcconti,
 	}))
 
 	const totali: TotaliRisultato = {
 		quotaBase: bolletta.totaleBolletta,
 		spesePostali: bolletta.spesePostali,
 		speseGestione: bolletta.speseGestione,
+		rettificaAcconti: bolletta.rettificaAcconti ?? 0,
 		totaleDaPagare:
-			bolletta.totaleBolletta + bolletta.spesePostali + bolletta.speseGestione,
+			bolletta.totaleBolletta +
+			bolletta.spesePostali +
+			bolletta.speseGestione +
+			(bolletta.rettificaAcconti ?? 0),
 	}
 
 	return {
@@ -323,7 +329,7 @@ export function calcolaRisultatiLuce(
 
 // Utility di formattazione
 export function fmt(value: number, decimals = 2): string {
-	return value.toFixed(decimals).replace('.', ',')
+	return value?.toFixed(decimals)?.replace('.', ',')
 }
 
 export function fmtEur(value: number): string {
