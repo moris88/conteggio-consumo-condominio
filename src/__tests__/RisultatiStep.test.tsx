@@ -39,8 +39,6 @@ describe('RisultatiStep', () => {
 	beforeEach(() => {
 		useAppStore.getState().reset()
 		vi.clearAllMocks()
-		vi.stubGlobal('prompt', vi.fn(() => 'Nota test'))
-		vi.stubGlobal('alert', vi.fn())
 	})
 
 	it('mostra avviso se non ci sono dati sufficienti', () => {
@@ -143,7 +141,7 @@ describe('RisultatiStep', () => {
 		expect(globalThis.URL.createObjectURL).toHaveBeenCalled()
 	})
 
-	it('salva i risultati nello storico', async () => {
+	it('salva i risultati nello storico tramite modal', async () => {
 		await act(async () => {
 			useAppStore.getState().addCondomino({
 				nome: 'Mario',
@@ -166,12 +164,28 @@ describe('RisultatiStep', () => {
 
 		render(<RisultatiStep />)
 
+		// Apre il modal
 		const saveBtn = screen.getByRole('button', { name: /Salva in Storico/i })
 		await act(async () => {
 			fireEvent.click(saveBtn)
 		})
 
+		// Il modal è aperto (verifica presenza input nota)
+		expect(screen.getByPlaceholderText(/Bolletta dicembre/i)).toBeDefined()
+
+		// Inserisce una nota
+		const notaInput = screen.getByPlaceholderText(/Bolletta dicembre/i)
+		fireEvent.change(notaInput, { target: { value: 'Nota dal test' } })
+
+		// Conferma il salvataggio
+		const confirmBtn = screen.getByRole('button', { name: /^Salva$/i })
+		await act(async () => {
+			fireEvent.click(confirmBtn)
+		})
+
 		expect(useAppStore.getState().storico).toHaveLength(1)
+		expect(useAppStore.getState().storico[0].note).toBe('Nota dal test')
+		expect(useAppStore.getState().activeStep).toBe('storico')
 	})
 
 	it('mostra alert discrepanza elevata', async () => {
