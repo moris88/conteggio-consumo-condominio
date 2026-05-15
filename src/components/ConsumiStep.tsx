@@ -66,7 +66,7 @@ export function ConsumiStep() {
 					<CardTitle>Configurazione e Letture</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-6">
-					<div className="flex flex-col gap-4 px-5 pt-4">
+					<div className="flex flex-col gap-4">
 						<Select
 							label="Soglia discrepanza elevata"
 							options={SOGLIE_DISCREPANZA}
@@ -224,12 +224,13 @@ export function ConsumiStep() {
 						})}
 					</div>
 				</CardContent>
-				<CardFooter>
-					<Button variant="secondary" onClick={() => setActiveStep('bolletta')}>
+				<CardFooter className="flex-col gap-2 sm:flex-row">
+					<Button variant="secondary" className="w-full sm:w-auto" onClick={() => setActiveStep('bolletta')}>
 						← Bolletta
 					</Button>
 					<Button
 						disabled={!isReady}
+						className="w-full sm:w-auto"
 						onClick={() => setActiveStep('risultati')}
 					>
 						Calcola Risultati →

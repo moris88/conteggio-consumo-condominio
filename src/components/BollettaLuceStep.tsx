@@ -122,14 +122,15 @@ export function BollettaLuceStep() {
 				</CardContent>
 			</Card>
 
-			<div className="flex flex-wrap items-center justify-between gap-3">
-				<Button type="button" variant="ghost" onClick={handleReset}>
+			<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+				<Button type="button" variant="ghost" onClick={handleReset} className="w-full sm:w-auto">
 					Azzera dati bolletta
 				</Button>
-				<div className="flex gap-3">
+				<div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
 					<Button
 						type="button"
 						variant="secondary"
+						className="w-full sm:w-auto"
 						onClick={() => setActiveStep('condomini')}
 					>
 						← Condomini
@@ -138,6 +139,7 @@ export function BollettaLuceStep() {
 						type="button"
 						variant="primary"
 						disabled={!isValid}
+						className="w-full sm:w-auto"
 						onClick={() => setActiveStep('risultati')}
 					>
 						Continua → Risultati

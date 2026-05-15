@@ -128,7 +128,7 @@ export function App() {
 
 			<main className="mx-auto max-w-full px-4 py-6">
 				{activeStep !== 'storico' && (
-					<div className="mb-5 flex items-center gap-2">
+					<div className="mb-5 flex flex-wrap items-center gap-2">
 						{TABS.map((t) => {
 							const Icon = t.icon
 							const isActive = type === t.id

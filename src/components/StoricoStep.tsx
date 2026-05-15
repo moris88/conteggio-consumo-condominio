@@ -80,10 +80,10 @@ export function StoricoStep() {
 
 	return (
 		<div className="space-y-6">
-			<div className="flex flex-wrap items-center justify-between gap-4">
+			<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
 				<h2 className="font-bold text-2xl text-slate-800">Storico Bollette</h2>
 				<div className="flex flex-wrap items-center gap-2">
-					<div className="mr-2 flex items-center gap-2">
+					<div className="flex w-full items-center gap-2 sm:w-auto">
 						<span className="text-nowrap font-medium text-slate-500 text-xs uppercase">
 							Ordina per:
 						</span>
@@ -95,7 +95,7 @@ export function StoricoStep() {
 								{ value: 'numero', label: 'Numero Bolletta' },
 								{ value: 'tipo', label: 'Tipo (Acqua/Luce)' },
 							]}
-							className="h-8 min-w-37.5 py-0 text-xs"
+							className="h-8 flex-1 py-0 text-xs sm:min-w-37.5 sm:flex-none"
 						/>
 					</div>
 					<label className="cursor-pointer">
@@ -141,23 +141,33 @@ export function StoricoStep() {
 									</div>
 									<div className="text-slate-600 text-sm italic">
 										{editingId === item.id ? (
-											<div className="mt-2 flex gap-2">
+											<div className="mt-2 flex flex-col gap-2">
 												<textarea
 													value={tempNote}
 													onChange={(e) => setTempNote(e.target.value)}
-													className="flex-1 rounded border border-slate-200 px-2 py-1 text-sm"
+													className="w-full rounded border border-slate-200 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
 													placeholder="Aggiungi una nota..."
+													rows={3}
 												/>
-												<Button
-													size="sm"
-													variant="primary"
-													onClick={() => {
-														updateNotaStorico(item.id, tempNote)
-														setEditingId(null)
-													}}
-												>
-													Salva
-												</Button>
+												<div className="flex justify-end gap-2">
+													<Button
+														size="sm"
+														variant="secondary"
+														onClick={() => setEditingId(null)}
+													>
+														Annulla
+													</Button>
+													<Button
+														size="sm"
+														variant="primary"
+														onClick={() => {
+															updateNotaStorico(item.id, tempNote)
+															setEditingId(null)
+														}}
+													>
+														Salva
+													</Button>
+												</div>
 											</div>
 										) : (
 											<button

@@ -285,9 +285,10 @@ export function RisultatiStep() {
 			</div>
 
 			<Card>
-				<CardHeader
-					actions={
-						<div className="flex flex-col flex-wrap gap-2 md:flex-row">
+				<CardHeader>
+					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+						<CardTitle>Tabella Ripartizione</CardTitle>
+						<div className="flex flex-wrap gap-2">
 							<Button
 								variant="secondary"
 								size="sm"
@@ -318,9 +319,7 @@ export function RisultatiStep() {
 								Salva in Storico
 							</Button>
 						</div>
-					}
-				>
-					<CardTitle>Tabella Ripartizione</CardTitle>
+					</div>
 				</CardHeader>
 				<CardContent className="p-0">
 					<div ref={tableRef} className="overflow-x-auto bg-white p-4">
